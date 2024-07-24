@@ -13,7 +13,7 @@ int main()
 	{
 		if (pServer->ServerControl() == false)
 		{
-			//pServer->Monitor();
+			pServer->PrintServerStatus();
 		}
 		Sleep(1000);
 	}

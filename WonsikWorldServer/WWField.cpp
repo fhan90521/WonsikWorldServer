@@ -29,6 +29,16 @@ WWField::~WWField()
     delete[] _sectorMap;
 }
 
+void WWField::PrintFieldStatus()
+{
+	std::cout << std::format(R"(
+--Field {} Status
+PlayerNum: {}                                 
+UpdateTps: {}
+)",GetRoomID(), _playerMap.size(), GetUpdateCnt());
+
+}
+
 void WWField::Update(float deltaTime)
 {
 	for (const std::pair<SessionInfo::ID,WWPlayer*>& tempPair : _playerMap)
@@ -47,6 +57,10 @@ void WWField::OnEnter(SessionInfo sessionInfo)
   SharedPtr<WWSession> wwSession = _wwServer->GetWWSession(sessionInfo);
   if (wwSession && wwSession->wwPlayer)
   {
+	  int beforeRoomID=wwSession->roomID;
+	  wwSession->roomID = GetRoomID();
+	  _wwServer->ChangeMap_SC(wwSession->sessionInfo, beforeRoomID, wwSession->roomID);
+	  
 	  //g_cacheTracer.trace(pNewPlayer, "player");
 	  WWPlayer* newPlayer = wwSession->wwPlayer;
 
@@ -69,8 +83,8 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  }
 		
 	  //Debug용
-	  newLocation.first = 50;
-	  newLocation.second = 50;
+	  //newLocation.first = 50;
+	  //newLocation.second = 50;
 
 	  //player Init
 	  newPlayer->SetLocation(newLocation);
@@ -78,6 +92,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  newPlayer->sector.x = newLocation.first / SECTOR_SIZE + 1;
 	  newPlayer->sector.y = newLocation.second / SECTOR_SIZE + 1;
 
+	  //Log::LogOnConsole(Log::ERROR_LEVEL, "newPlayer ID:%d, roomID %d", newPlayer->GetPlayerID(), GetRoomID());
 	  //당사자와 주위 섹터 플레이어들 업데이트
 	  _wwServer->CreateMyCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), DEFAULT_DIRX, DEFAULT_DIRY, newLocation.first, newLocation.second);
 
@@ -88,8 +103,12 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  for (int i = 0; i < aroundSector.cnt; i++)
 	  {
 
-		  for (auto& pPlayer : _sectorMap[aroundSector.around[i].y][aroundSector.around[i].x])
+		  for (WWPlayer* pPlayer : _sectorMap[aroundSector.around[i].y][aroundSector.around[i].x])
 		  {
+			  if (pPlayer == newPlayer)
+			  {
+				  continue;
+			  }
 			  //accept한 사람한테 다른 player 보내기
 			  auto pPlayerDirVec = pPlayer->GetDirVec();
 			  auto pPlayerLocation = pPlayer->GetLocation();
@@ -130,6 +149,7 @@ void WWField::OnLeave(SessionInfo sessionInfo)
 		_playerMap.erase(iter);
 		_sectorMap[pPlayer->sector.y][pPlayer->sector.x].remove(pPlayer);
 
+		//Log::LogOnConsole(Log::ERROR_LEVEL, "removePlayer ID:%d, roomID %d", pPlayer->GetPlayerID(), GetRoomID());
 		SECTOR_AROUND aroundSector;
 		GetSectorAround(pPlayer, aroundSector);
 
@@ -347,7 +367,6 @@ bool WWField::CheckSectorUpdate(WWPlayer* wwPlayer)
 	int currentSectorY = location.second / SECTOR_SIZE + 1;
 	if (currentSectorX != wwPlayer->sector.x || currentSectorY != wwPlayer->sector.y)
 	{
-		Log::LogOnConsole(Log::DEBUG_LEVEL, "CheckSectorUpdate  wwPlayer: %f wwPlayer: %f pAddPlayer : %f pAddPlayer: %f\n", wwPlayer->GetLocation().first, wwPlayer->GetLocation().second);
 		return true;
 	}
 	return false;
@@ -363,9 +382,12 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 	{
 		for (WWPlayer* pRemovePlayer : _sectorMap[removeSector.around[i].y][removeSector.around[i].x])
 		{
-			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayer: %f wwPlayer: %f pRemovePlayer : %f pRemovePlayer: %f\n", wwPlayer->GetLocation().first, wwPlayer->GetLocation().second, pRemovePlayer->GetLocation().first, pRemovePlayer->GetLocation().second);
-			_wwServer->DeleteCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(), pRemovePlayer->GetPlayerID());
-			_wwServer->DeleteCharacter_SC(pRemovePlayer->GetSessionInfo(), GetRoomID(),wwPlayer->GetPlayerID());
+			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayerId :%d, wwPlayerX: %f wwPlayerY: %f, removePlayerID: %d, removeX : %f removeY: %f\n", wwPlayer->GetPlayerID(), wwPlayer->GetLocation().first, wwPlayer->GetLocation().second, pRemovePlayer->GetPlayerID(), pRemovePlayer->GetLocation().first, pRemovePlayer->GetLocation().second);
+			if (pRemovePlayer != wwPlayer)
+			{
+				_wwServer->DeleteCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(), pRemovePlayer->GetPlayerID());
+				_wwServer->DeleteCharacter_SC(pRemovePlayer->GetSessionInfo(), GetRoomID(), wwPlayer->GetPlayerID());
+			}
 		}
 	}
 
@@ -382,6 +404,10 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 	{
 		for (WWPlayer* pAddPlayer : _sectorMap[addSector.around[i].y][addSector.around[i].x])
 		{
+			if (wwPlayer == pAddPlayer)
+			{
+				continue;
+			}
 			auto otherDirVec = pAddPlayer->GetDirVec();
 			auto otherLocation = pAddPlayer->GetLocation();
 			_wwServer->CreateOtherCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(),pAddPlayer->GetPlayerID(), pAddPlayer->_nickName, otherDirVec.first, otherDirVec.second, otherLocation.first, otherLocation.second);
@@ -399,7 +425,7 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 				_wwServer->MoveOtherCharacter_SC(pAddPlayer->GetSessionInfo(), GetRoomID(), wwPlayer->GetPlayerID(), myDestinationXs, myDestinationYs);
 			}
 
-			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayer: %f wwPlayer: %f pAddPlayer : %f pAddPlayer: %f\n", wwPlayer->GetLocation().first, wwPlayer->GetLocation().second, pAddPlayer->GetLocation().first, pAddPlayer->GetLocation().second);
+			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayerId :%d, wwPlayerX: %f wwPlayerY: %f, addPlayerID: %d, pAddPlayer : %f pAddPlayer: %f\n", wwPlayer->GetPlayerID(), wwPlayer->GetLocation().first, wwPlayer->GetLocation().second, pAddPlayer->GetPlayerID(), pAddPlayer->GetLocation().first, pAddPlayer->GetLocation().second);
 
 		}
 	}
@@ -487,12 +513,7 @@ void WWField::SetCharacterDestination(SharedPtr<WWSession> wwSession, float dest
 void WWField::ChangeField(SharedPtr<WWSession> wwSession, int beforeMapID, int afterMapID)
 {
 	ChangeRoom(wwSession->sessionInfo, beforeMapID, afterMapID);
-	if (afterMapID != INVALID_ROOM_ID)
-	{
-		wwSession->roomID = afterMapID;
-		_wwServer->ChangeMap_SC(wwSession->sessionInfo, beforeMapID, afterMapID);
-	}
-	else
+	if (afterMapID == INVALID_ROOM_ID)
 	{
 		_wwServer->Disconnect(wwSession->sessionInfo);
 	}

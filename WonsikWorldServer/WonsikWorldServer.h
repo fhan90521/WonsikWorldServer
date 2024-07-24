@@ -9,13 +9,18 @@
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
+#include "PerformanceMonitor.h"
 class WonsikWorldServer : public IOCPServer,public WonsikWorldServerProxy, public WonsikWorldServerStub
 {
+private:
+	PerformanceMonitor _monitor;
 public:
 	WonsikWorldServer();
 	~WonsikWorldServer();
 	virtual void Run() override;
+	void PrintServerStatus();
 private:
+
 	virtual bool OnAcceptRequest(const char* ip, USHORT port) override;
 	virtual void OnAccept(SessionInfo sessionInfo) override;
 	virtual void OnDisconnect(SessionInfo sessionInfo) override;

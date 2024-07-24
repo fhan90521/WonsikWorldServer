@@ -9,6 +9,7 @@ class WWField :public Room
 public:
 	WWField(class WonsikWorldServer* pServer);
 	virtual ~WWField();
+	void PrintFieldStatus();
 private:
 	//Update에서 순차적으로 돌면서 move를 시켜야함으로 PLAYER_MAP이나 SET이 필요하다.
 	HashMap<SessionInfo::ID, class WWPlayer*> _playerMap;

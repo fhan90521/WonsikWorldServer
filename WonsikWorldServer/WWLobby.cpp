@@ -12,6 +12,16 @@ WWLobby::WWLobby(WonsikWorldServer* pServer): Room(pServer)
 	_wwServer=pServer;
 }
 
+void WWLobby::PrintLobbyStatus()
+{
+	std::cout << std::format(R"(
+--LobbyStatus
+SessionNum: {}                                 
+UpdateTps: {}
+)", GetSessionCnt(), GetUpdateCnt());
+
+}
+
 void WWLobby::Update(float deltaTime)
 {
   
@@ -63,12 +73,7 @@ void WWLobby::EnterGame(SharedPtr<WWSession> wwSession, WString nickName)
 		int beforeRoomID = wwSession->roomID;
 		int afterRoomID = ROOM_ID_FIELD1;
 		ChangeRoom(wwSession->sessionInfo,beforeRoomID, afterRoomID);
-		if (beforeRoomID == ROOM_ID_LOBBY && afterRoomID == ROOM_ID_FIELD1)
-		{
-			wwSession->roomID = afterRoomID;
-			_wwServer->ChangeMap_SC(wwSession->sessionInfo, MAP_ID_LOBBY, MAP_ID_FIELD1);
-		}
-		else
+		if (beforeRoomID != ROOM_ID_LOBBY || afterRoomID != ROOM_ID_FIELD1)
 		{
 			_wwServer->Disconnect(wwSession->sessionInfo);
 		}

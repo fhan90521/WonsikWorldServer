@@ -7,6 +7,8 @@
 #include "WWPlayer.h"
 #include "WWField.h"
 #include "MapSource.h"
+#include <iostream>
+#include <format>
 WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("WWServerSet.Json")
 {
 	_lobby = MakeShared<WWLobby>(this);
@@ -47,6 +49,23 @@ void WonsikWorldServer::Run()
 	IOCPRun();
 }
 
+void WonsikWorldServer::PrintServerStatus()
+{
+	std::cout << std::format(R"(
+-------------------------------------
+SessionNum: {}                                 
+Accept Tps: {}
+RecvMessageTps: {}
+SendMessageTps: {}
+
+)", GetConnectingSessionCnt(), GetAcceptCnt(),GetRecvCnt(), GetSendCnt());
+
+	_monitor.PrintMonitorData();
+	_lobby->PrintLobbyStatus();
+	_fields[ROOM_ID_FIELD1]->PrintFieldStatus();
+	_fields[ROOM_ID_FIELD2]->PrintFieldStatus();
+}
+
 bool WonsikWorldServer::OnAcceptRequest(const char* ip, USHORT port)
 {
 	Log::LogOnConsole(Log::DEBUG_LEVEL, "connect ip: %s", ip);
@@ -72,6 +91,7 @@ void WonsikWorldServer::OnRecv(SessionInfo sessionInfo, CRecvBuffer& buf)
 {
 	if (PacketProc(sessionInfo, buf) == false)
 	{
+		Log::LogOnFile(Log::SYSTEM_LEVEL, "OnRecv Error\n");
 		Disconnect(sessionInfo);
 	}
 	else

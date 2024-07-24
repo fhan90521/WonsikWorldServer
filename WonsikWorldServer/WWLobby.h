@@ -6,6 +6,7 @@ class WWLobby:public Room
 public:
 	WWLobby(class WonsikWorldServer* pServer);
 	virtual ~WWLobby() {};
+	void PrintLobbyStatus();
 private:
 	class WonsikWorldServer* _wwServer;
 	virtual void Update(float deltaTime) override;
@@ -19,4 +20,5 @@ private:
 public:
 	void EnterGame(SharedPtr<struct WWSession> wwSession,WString nickName);
 	void LeaveGame(WString nickName);
+
 };
