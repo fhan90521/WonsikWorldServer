@@ -105,7 +105,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 
 		  for (WWPlayer* pPlayer : _sectorMap[aroundSector.around[i].y][aroundSector.around[i].x])
 		  {
-			  if (pPlayer == newPlayer)
+			  if (pPlayer->GetPlayerID() == newPlayer->GetPlayerID())
 			  {
 				  continue;
 			  }
@@ -351,7 +351,7 @@ void WWField::GetSessionInfoInAroundSector(List<SessionInfo>& sessionInfoListInA
 			}
 			else
 			{
-				if (aroundPlayer!= wwPlayer)
+				if (aroundPlayer->GetPlayerID() != wwPlayer->GetPlayerID())
 				{
 					sessionInfoListInAroundSector.push_back(aroundPlayer->GetSessionInfo());
 				}
@@ -383,7 +383,7 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 		for (WWPlayer* pRemovePlayer : _sectorMap[removeSector.around[i].y][removeSector.around[i].x])
 		{
 			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayerId :%d, wwPlayerX: %f wwPlayerY: %f, removePlayerID: %d, removeX : %f removeY: %f\n", wwPlayer->GetPlayerID(), wwPlayer->GetLocation().first, wwPlayer->GetLocation().second, pRemovePlayer->GetPlayerID(), pRemovePlayer->GetLocation().first, pRemovePlayer->GetLocation().second);
-			if (pRemovePlayer != wwPlayer)
+			if (pRemovePlayer->GetPlayerID() != wwPlayer->GetPlayerID())
 			{
 				_wwServer->DeleteCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(), pRemovePlayer->GetPlayerID());
 				_wwServer->DeleteCharacter_SC(pRemovePlayer->GetSessionInfo(), GetRoomID(), wwPlayer->GetPlayerID());
@@ -404,7 +404,7 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 	{
 		for (WWPlayer* pAddPlayer : _sectorMap[addSector.around[i].y][addSector.around[i].x])
 		{
-			if (wwPlayer == pAddPlayer)
+			if (wwPlayer->GetPlayerID() == pAddPlayer->GetPlayerID())
 			{
 				continue;
 			}
