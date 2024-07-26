@@ -73,7 +73,7 @@ void WWLobby::EnterGame(SharedPtr<WWSession> wwSession, WString nickName)
 		int beforeRoomID = wwSession->roomID;
 		int afterRoomID = ROOM_ID_FIELD1;
 		ChangeRoom(wwSession->sessionInfo,beforeRoomID, afterRoomID);
-		if (beforeRoomID != ROOM_ID_LOBBY || afterRoomID != ROOM_ID_FIELD1)
+		if (afterRoomID != CHANGING_ROOM_ID)
 		{
 			_wwServer->Disconnect(wwSession->sessionInfo);
 		}
@@ -85,7 +85,12 @@ void WWLobby::EnterGame(SharedPtr<WWSession> wwSession, WString nickName)
 	}
 }
 
-void WWLobby::LeaveGame(WString nickName)
+void WWLobby::LeaveGame(SharedPtr<WWSession> wwSession)
 {
-	_namesOnPlay.erase(nickName);
+	if (wwSession->sessionType == SessionType::GUEST)
+	{
+		_wwServer->Disconnect(wwSession->sessionInfo);
+		return;
+	}
+	_namesOnPlay.erase(wwSession->wwPlayer->_nickName);
 }

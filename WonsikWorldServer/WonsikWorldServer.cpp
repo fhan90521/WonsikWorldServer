@@ -9,7 +9,7 @@
 #include "MapSource.h"
 #include <iostream>
 #include <format>
-WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("WWServerSet.Json")
+WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("WWServerSet.Json"),_wwRoomSystem(this)
 {
 	_lobby = MakeShared<WWLobby>(this);
 	_fields[ROOM_ID_FIELD1] = MakeShared<WWField>(this);
@@ -80,9 +80,9 @@ void WonsikWorldServer::OnAccept(SessionInfo sessionInfo)
 void WonsikWorldServer::OnDisconnect(SessionInfo sessionInfo)
 {
 	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo);
-	if (wwSession && wwSession->wwPlayer)
+	if (wwSession)
 	{
-		_lobby->TryDoSync(&WWLobby::LeaveGame, wwSession->wwPlayer->_nickName);
+		_lobby->TryDoSync(&WWLobby::LeaveGame,wwSession);
 	}
 	_wwRoomSystem.LeaveRoomSystem(sessionInfo);	
 }

@@ -19,6 +19,6 @@ private:
 	HashSet<WString> _namesOnPlay;
 public:
 	void EnterGame(SharedPtr<struct WWSession> wwSession,WString nickName);
-	void LeaveGame(WString nickName);
+	void LeaveGame(SharedPtr<WWSession> wwSession);
 
 };
