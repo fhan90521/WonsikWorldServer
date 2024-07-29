@@ -36,7 +36,7 @@ private:
 	RoomSystem _wwRoomSystem;
 	SharedPtr<class WWLobby> _lobby;
 	Array<SharedPtr<class WWField>,3> _fields;
-	USE_MUTEX;
+	USE_LOCK;
 	HashMap<SessionInfo::ID, SharedPtr<struct WWSession>> _wwSessions;
 private:
 	HANDLE _hShutDownEvent;

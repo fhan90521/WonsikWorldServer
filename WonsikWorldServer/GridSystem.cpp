@@ -621,7 +621,6 @@ GridSystem::Node* GridSystem::MakeNewNode(int x, int y, Node* pParentNode)
     pNewNode->moveLen = pParentNode->moveLen + sqrt(pow(abs(x - pParentNode->x), 2) + pow(abs(y - pParentNode->y), 2));
     return pNewNode;
 }
-
 void GridSystem::UpdateLists(int currentX, int currentY, Node* pParentNode)
 {
     auto pairXY = std::make_pair(currentX, currentY);
@@ -647,7 +646,6 @@ void GridSystem::UpdateLists(int currentX, int currentY, Node* pParentNode)
         }
     }
 }
-
 bool GridSystem::CheckObstacleOnLine(double beginX, double beginY, double endX, double endY)
 {
     int lowX = min(beginX, endX);
@@ -702,7 +700,6 @@ GridSystem::GridSystem(int height, int width, float cellSize)
 
     }
 }
-
 GridSystem::~GridSystem()
 {
     for (int i = 0; i < _height + 2; i++)
@@ -711,7 +708,6 @@ GridSystem::~GridSystem()
     }
     delete[] _obstacleMap;
 }
-
 bool GridSystem::CheckObstacleOnLineByBresenham(double beginX, double beginY, double endX, double endY)
 {
     int difX = abs(beginX - endX);
@@ -776,7 +772,6 @@ bool GridSystem::CheckObstacleOnLineByBresenham(double beginX, double beginY, do
     }
     return true;
 }
-
 void GridSystem::FreeNodes()
 {
     for (Node* pNode : _allocatedNodes)

@@ -193,7 +193,7 @@ void WonsikWorldServer::ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMa
 	int afterRoomID = afterMapID;
 	if (wwSession && wwSession->roomID == beforeRoomID && beforeRoomID>ROOM_ID_LOBBY)
 	{
-		_fields[beforeRoomID]->TryDoSync(&WWField::ChangeField, wwSession, beforeRoomID, afterRoomID);
+		_fields[beforeRoomID]->TryDoSync(&WWField::ChangeField, wwSession, afterRoomID);
 	}
 	else
 	{

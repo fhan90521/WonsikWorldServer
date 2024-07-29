@@ -66,14 +66,10 @@ void WWLobby::EnterGame(SharedPtr<WWSession> wwSession, WString nickName)
 		newPlayer->SetSessionInfo(wwSession->sessionInfo);
 		newPlayer->SetPlayerID(_newPlayerID++);
 		
-		short result = ENTER_GAME_SUCCESS;
-		_wwServer->EnterGame_SC(wwSession->sessionInfo, result, newPlayer->GetPlayerID());
+
+		_wwServer->EnterGame_SC(wwSession->sessionInfo, ENTER_GAME_SUCCESS, newPlayer->GetPlayerID());
 		
-		
-		int beforeRoomID = wwSession->roomID;
-		int afterRoomID = ROOM_ID_FIELD1;
-		ChangeRoom(wwSession->sessionInfo,beforeRoomID, afterRoomID);
-		if (afterRoomID != CHANGING_ROOM_ID)
+		if (ChangeRoom(wwSession->sessionInfo, ROOM_ID_FIELD1)==false)
 		{
 			_wwServer->Disconnect(wwSession->sessionInfo);
 		}

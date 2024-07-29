@@ -510,10 +510,9 @@ void WWField::SetCharacterDestination(SharedPtr<WWSession> wwSession, float dest
 	}
 }
 
-void WWField::ChangeField(SharedPtr<WWSession> wwSession, int beforeMapID, int afterMapID)
+void WWField::ChangeField(SharedPtr<WWSession> wwSession, int afterMapID)
 {
-	ChangeRoom(wwSession->sessionInfo, beforeMapID, afterMapID);
-	if (afterMapID != CHANGING_ROOM_ID)
+	if (ChangeRoom(wwSession->sessionInfo, afterMapID) == false)
 	{
 		_wwServer->Disconnect(wwSession->sessionInfo);
 	}
