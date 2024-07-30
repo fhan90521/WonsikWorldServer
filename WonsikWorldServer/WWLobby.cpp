@@ -7,7 +7,7 @@
 #include <memory>
 #include "RoomSystem.h"
 #include "MyNew.h"
-WWLobby::WWLobby(WonsikWorldServer* pServer): Room(pServer)
+WWLobby::WWLobby(WonsikWorldServer* pServer): Room(pServer->GetCompletionPortHandle())
 {
 	_wwServer=pServer;
 }
