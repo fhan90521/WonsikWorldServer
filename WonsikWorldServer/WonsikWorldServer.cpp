@@ -82,7 +82,7 @@ void WonsikWorldServer::OnDisconnect(SessionInfo sessionInfo)
 	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo);
 	if (wwSession)
 	{
-		_lobby->TryDoSync(&WWLobby::LeaveGame,wwSession);
+		_lobby->DoAsync(&WWLobby::LeaveGame,wwSession);
 	}
 	_wwRoomSystem.LeaveRoomSystem(sessionInfo);	
 }
@@ -178,7 +178,7 @@ void WonsikWorldServer::ProcEnterGame_CS(SessionInfo sessionInfo, WString& nickN
 	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.id);
 	if (wwSession && wwSession->roomID == ROOM_ID_LOBBY)
 	{
-		_lobby->TryDoSync(&WWLobby::EnterGame, wwSession, nickName);
+		_lobby->DoAsync(&WWLobby::EnterGame, wwSession, nickName);
 	}
 	else
 	{
@@ -193,7 +193,7 @@ void WonsikWorldServer::ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMa
 	int afterRoomID = afterMapID;
 	if (wwSession && wwSession->roomID == beforeRoomID && beforeRoomID>ROOM_ID_LOBBY)
 	{
-		_fields[beforeRoomID]->TryDoSync(&WWField::ChangeField, wwSession, afterRoomID);
+		_fields[beforeRoomID]->DoAsync(&WWField::ChangeField, wwSession, afterRoomID);
 	}
 	else
 	{
@@ -207,7 +207,7 @@ void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, short ma
 	int roomID = mapID;
 	if (wwSession && wwSession->roomID == roomID && roomID > ROOM_ID_LOBBY)
 	{
-		_fields[wwSession->roomID]->TryDoSync(&WWField::SendChatMessage, wwSession, chatMessage);
+		_fields[wwSession->roomID]->DoAsync(&WWField::SendChatMessage, wwSession, chatMessage);
 	}
 	else
 	{
@@ -222,7 +222,7 @@ void WonsikWorldServer::ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short ma
 	int roomID = mapID;
 	if (wwSession && wwSession->roomID == roomID && roomID > ROOM_ID_LOBBY)
 	{
-		_fields[wwSession->roomID]->TryDoSync(&WWField::SetCharacterDestination, wwSession, destinationX, destinationY);
+		_fields[wwSession->roomID]->DoAsync(&WWField::SetCharacterDestination, wwSession, destinationX, destinationY);
 	}
 	else
 	{
