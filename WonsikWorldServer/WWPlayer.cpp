@@ -58,6 +58,8 @@ bool WWPlayer::GetDestinations(Vector<float>& destinationXs, Vector<float>& dest
     {
         return false;
     }
+    destinationXs.push_back(_location.first);
+    destinationYs.push_back(_location.second);
     for (auto& destination : _destinations)
     {
         destinationXs.push_back(destination.first);
@@ -119,7 +121,7 @@ void WWPlayer::Move(float deltaTime)
         newDirVec.second = destination.second - _location.second;
         Normalize(newDirVec);
         _dirVec = newDirVec;
-
+    
         _location.first += _dirVec.first * _moveSpeed * deltaTime;
         _location.second += _dirVec.second * _moveSpeed * deltaTime;
    
@@ -132,12 +134,9 @@ void WWPlayer::Move(float deltaTime)
       
    
         float distance = GetDistanceBetweenTwoPoint(destination.first, destination.second, _location.first, _location.second);
-        //Log::LogOnConsole(Log::DEBUG_LEVEL, "distance: %f\n", distance);
         //도착했는지 확인
-        if (IsSameGrid(destination.first, destination.second, _location.first, _location.second, GRID_CELL_SIZE) == true &&
-            GetDistanceBetweenTwoPoint(destination.first, destination.second, _location.first, _location.second) < CLOSE_DISTANCE)
+        if (IsSameGrid(destination.first, destination.second, _location.first, _location.second, GRID_CELL_SIZE) == true && distance < CLOSE_DISTANCE)
         {
-            
             _destinations.pop_front();
         }
 

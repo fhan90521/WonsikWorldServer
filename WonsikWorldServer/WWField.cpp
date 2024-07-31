@@ -41,6 +41,7 @@ UpdateTps: {}
 
 void WWField::Update(float deltaTime)
 {
+	
 	for (const std::pair<SessionInfo::ID,WWPlayer*>& tempPair : _playerMap)
 	{
 		WWPlayer* wwPlayer=tempPair.second;
