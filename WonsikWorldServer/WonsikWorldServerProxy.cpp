@@ -1,4 +1,4 @@
-#include  "WonsikWorldServerProxy.h"
+#include "WonsikWorldServerProxy.h"
 #include "WonsikWorldPKT_TYPE.h"
 void WonsikWorldServerProxy::EnterGame_CS(SessionInfo sessionInfo, WString& nickName, bool bDisconnect)
 {

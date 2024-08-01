@@ -1,8 +1,8 @@
-#include "WonsikWorldServerStub.h"
+#include "WonsikWorldClientStub.h"
 #include "IOCPServer.h"
 #include "Log.h"
 using namespace std;
-bool WonsikWorldServerStub::PacketProcEnterGame_CS(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcEnterGame_CS(CRecvBuffer& buf)
 {
 	WString nickName;
 	try
@@ -14,11 +14,11 @@ bool WonsikWorldServerStub::PacketProcEnterGame_CS(SessionInfo sessionInfo, CRec
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcEnterGame_CS error\n");
 		return false;
 	}
-	ProcEnterGame_CS(sessionInfo, nickName);
+	ProcEnterGame_CS(, nickName);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcEnterGame_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcEnterGame_SC(CRecvBuffer& buf)
 {
 	short enterGameResult;
 	LONG64 playerID;
@@ -31,11 +31,11 @@ bool WonsikWorldServerStub::PacketProcEnterGame_SC(SessionInfo sessionInfo, CRec
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcEnterGame_SC error\n");
 		return false;
 	}
-	ProcEnterGame_SC(sessionInfo, enterGameResult, playerID);
+	ProcEnterGame_SC(, enterGameResult, playerID);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcCreateMyCharacter_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcCreateMyCharacter_SC(CRecvBuffer& buf)
 {
 	short mapID;
 	float dirX;
@@ -51,11 +51,11 @@ bool WonsikWorldServerStub::PacketProcCreateMyCharacter_SC(SessionInfo sessionIn
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcCreateMyCharacter_SC error\n");
 		return false;
 	}
-	ProcCreateMyCharacter_SC(sessionInfo, mapID, dirX, dirY, locationX, locationY);
+	ProcCreateMyCharacter_SC(, mapID, dirX, dirY, locationX, locationY);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcCreateOtherCharacter_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcCreateOtherCharacter_SC(CRecvBuffer& buf)
 {
 	short mapID;
 	LONG64 playerID;
@@ -73,11 +73,11 @@ bool WonsikWorldServerStub::PacketProcCreateOtherCharacter_SC(SessionInfo sessio
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcCreateOtherCharacter_SC error\n");
 		return false;
 	}
-	ProcCreateOtherCharacter_SC(sessionInfo, mapID, playerID, nickName, dirX, dirY, locationX, locationY);
+	ProcCreateOtherCharacter_SC(, mapID, playerID, nickName, dirX, dirY, locationX, locationY);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcDeleteCharacter_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcDeleteCharacter_SC(CRecvBuffer& buf)
 {
 	short mapID;
 	LONG64 playerID;
@@ -90,11 +90,11 @@ bool WonsikWorldServerStub::PacketProcDeleteCharacter_SC(SessionInfo sessionInfo
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcDeleteCharacter_SC error\n");
 		return false;
 	}
-	ProcDeleteCharacter_SC(sessionInfo, mapID, playerID);
+	ProcDeleteCharacter_SC(, mapID, playerID);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcChangeMap_CS(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcChangeMap_CS(CRecvBuffer& buf)
 {
 	short beforeMapID;
 	short afterMapID;
@@ -107,11 +107,11 @@ bool WonsikWorldServerStub::PacketProcChangeMap_CS(SessionInfo sessionInfo, CRec
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcChangeMap_CS error\n");
 		return false;
 	}
-	ProcChangeMap_CS(sessionInfo, beforeMapID, afterMapID);
+	ProcChangeMap_CS(, beforeMapID, afterMapID);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcChangeMap_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcChangeMap_SC(CRecvBuffer& buf)
 {
 	short beforeMapID;
 	short afterMapID;
@@ -124,11 +124,11 @@ bool WonsikWorldServerStub::PacketProcChangeMap_SC(SessionInfo sessionInfo, CRec
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcChangeMap_SC error\n");
 		return false;
 	}
-	ProcChangeMap_SC(sessionInfo, beforeMapID, afterMapID);
+	ProcChangeMap_SC(, beforeMapID, afterMapID);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcSendChatMessage_CS(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcSendChatMessage_CS(CRecvBuffer& buf)
 {
 	short mapID;
 	WString chatMessage;
@@ -141,11 +141,11 @@ bool WonsikWorldServerStub::PacketProcSendChatMessage_CS(SessionInfo sessionInfo
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcSendChatMessage_CS error\n");
 		return false;
 	}
-	ProcSendChatMessage_CS(sessionInfo, mapID, chatMessage);
+	ProcSendChatMessage_CS(, mapID, chatMessage);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcSendChatMessage_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcSendChatMessage_SC(CRecvBuffer& buf)
 {
 	short mapID;
 	LONG64 playerID;
@@ -159,11 +159,11 @@ bool WonsikWorldServerStub::PacketProcSendChatMessage_SC(SessionInfo sessionInfo
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcSendChatMessage_SC error\n");
 		return false;
 	}
-	ProcSendChatMessage_SC(sessionInfo, mapID, playerID, chatMessage);
+	ProcSendChatMessage_SC(, mapID, playerID, chatMessage);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcMoveMyCharacter_CS(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcMoveMyCharacter_CS(CRecvBuffer& buf)
 {
 	short mapID;
 	float destinationX;
@@ -177,11 +177,11 @@ bool WonsikWorldServerStub::PacketProcMoveMyCharacter_CS(SessionInfo sessionInfo
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcMoveMyCharacter_CS error\n");
 		return false;
 	}
-	ProcMoveMyCharacter_CS(sessionInfo, mapID, destinationX, destinationY);
+	ProcMoveMyCharacter_CS(, mapID, destinationX, destinationY);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcMoveMyCharacter_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcMoveMyCharacter_SC(CRecvBuffer& buf)
 {
 	short mapID;
 	Vector<float> destinationsX;
@@ -195,11 +195,11 @@ bool WonsikWorldServerStub::PacketProcMoveMyCharacter_SC(SessionInfo sessionInfo
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcMoveMyCharacter_SC error\n");
 		return false;
 	}
-	ProcMoveMyCharacter_SC(sessionInfo, mapID, destinationsX, destinationsY);
+	ProcMoveMyCharacter_SC(, mapID, destinationsX, destinationsY);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcMoveOtherCharacter_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcMoveOtherCharacter_SC(CRecvBuffer& buf)
 {
 	short mapID;
 	LONG64 playerID;
@@ -214,11 +214,11 @@ bool WonsikWorldServerStub::PacketProcMoveOtherCharacter_SC(SessionInfo sessionI
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcMoveOtherCharacter_SC error\n");
 		return false;
 	}
-	ProcMoveOtherCharacter_SC(sessionInfo, mapID, playerID, destinationsX, destinationsY);
+	ProcMoveOtherCharacter_SC(, mapID, playerID, destinationsX, destinationsY);
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProcHeartBeat_CS(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProcHeartBeat_CS(CRecvBuffer& buf)
 {
 	try
 	{
@@ -229,11 +229,11 @@ bool WonsikWorldServerStub::PacketProcHeartBeat_CS(SessionInfo sessionInfo, CRec
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcHeartBeat_CS error\n");
 		return false;
 	}
-	ProcHeartBeat_CS(sessionInfo);
+	ProcHeartBeat_CS();
 	return true;
 }
 
-bool WonsikWorldServerStub::PacketProc(SessionInfo sessionInfo, CRecvBuffer& buf)
+bool WonsikWorldClientStub::PacketProc(CRecvBuffer& buf)
 {
 	short packetType;
 	try
@@ -248,67 +248,67 @@ bool WonsikWorldServerStub::PacketProc(SessionInfo sessionInfo, CRecvBuffer& buf
 	{
 	case PKT_TYPE_EnterGame_CS:
 	{
-		return PacketProcEnterGame_CS(sessionInfo, buf);
+		return PacketProcEnterGame_CS(buf);
 		break;
 	}
 	case PKT_TYPE_EnterGame_SC:
 	{
-		return PacketProcEnterGame_SC(sessionInfo, buf);
+		return PacketProcEnterGame_SC(buf);
 		break;
 	}
 	case PKT_TYPE_CreateMyCharacter_SC:
 	{
-		return PacketProcCreateMyCharacter_SC(sessionInfo, buf);
+		return PacketProcCreateMyCharacter_SC(buf);
 		break;
 	}
 	case PKT_TYPE_CreateOtherCharacter_SC:
 	{
-		return PacketProcCreateOtherCharacter_SC(sessionInfo, buf);
+		return PacketProcCreateOtherCharacter_SC(buf);
 		break;
 	}
 	case PKT_TYPE_DeleteCharacter_SC:
 	{
-		return PacketProcDeleteCharacter_SC(sessionInfo, buf);
+		return PacketProcDeleteCharacter_SC(buf);
 		break;
 	}
 	case PKT_TYPE_ChangeMap_CS:
 	{
-		return PacketProcChangeMap_CS(sessionInfo, buf);
+		return PacketProcChangeMap_CS(buf);
 		break;
 	}
 	case PKT_TYPE_ChangeMap_SC:
 	{
-		return PacketProcChangeMap_SC(sessionInfo, buf);
+		return PacketProcChangeMap_SC(buf);
 		break;
 	}
 	case PKT_TYPE_SendChatMessage_CS:
 	{
-		return PacketProcSendChatMessage_CS(sessionInfo, buf);
+		return PacketProcSendChatMessage_CS(buf);
 		break;
 	}
 	case PKT_TYPE_SendChatMessage_SC:
 	{
-		return PacketProcSendChatMessage_SC(sessionInfo, buf);
+		return PacketProcSendChatMessage_SC(buf);
 		break;
 	}
 	case PKT_TYPE_MoveMyCharacter_CS:
 	{
-		return PacketProcMoveMyCharacter_CS(sessionInfo, buf);
+		return PacketProcMoveMyCharacter_CS(buf);
 		break;
 	}
 	case PKT_TYPE_MoveMyCharacter_SC:
 	{
-		return PacketProcMoveMyCharacter_SC(sessionInfo, buf);
+		return PacketProcMoveMyCharacter_SC(buf);
 		break;
 	}
 	case PKT_TYPE_MoveOtherCharacter_SC:
 	{
-		return PacketProcMoveOtherCharacter_SC(sessionInfo, buf);
+		return PacketProcMoveOtherCharacter_SC(buf);
 		break;
 	}
 	case PKT_TYPE_HeartBeat_CS:
 	{
-		return PacketProcHeartBeat_CS(sessionInfo, buf);
+		return PacketProcHeartBeat_CS(buf);
 		break;
 	}
 	default:
