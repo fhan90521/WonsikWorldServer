@@ -108,7 +108,7 @@ void WonsikWorldServer::OnRecv(SessionInfo sessionInfo, CRecvBuffer& buf)
 SharedPtr<WWSession> WonsikWorldServer::GetWWSession(SessionInfo sessionInfo)
 {
 	SHARED_LOCK;
-	auto iter = _wwSessions.find(sessionInfo.id);
+	auto iter = _wwSessions.find(sessionInfo.Id());
 	if (iter != _wwSessions.end())
 	{
 		return iter->second;
@@ -153,11 +153,11 @@ void WonsikWorldServer::CreateWWSession(SessionInfo sessionInfo)
 	if(enterResult == true)
 	{
 		EXCLUSIVE_LOCK;
-		_wwSessions[sessionInfo.id] = MakeShared<WWSession>();
-		_wwSessions[sessionInfo.id]->sessionInfo = sessionInfo;
-		_wwSessions[sessionInfo.id]->roomID = ROOM_ID_LOBBY;
-		_wwSessions[sessionInfo.id]->lastRecvTime = GetTickCount64();
-		_wwSessions[sessionInfo.id]->sessionType = SessionType::GUEST;
+		_wwSessions[sessionInfo.Id()] = MakeShared<WWSession>();
+		_wwSessions[sessionInfo.Id()]->sessionInfo = sessionInfo;
+		_wwSessions[sessionInfo.Id()]->roomID = ROOM_ID_LOBBY;
+		_wwSessions[sessionInfo.Id()]->lastRecvTime = GetTickCount64();
+		_wwSessions[sessionInfo.Id()]->sessionType = SessionType::GUEST;
 	}
 	else
 	{
@@ -169,13 +169,13 @@ void WonsikWorldServer::DeleteWWSession(SessionInfo sessionInfo)
 {
 	{
 		EXCLUSIVE_LOCK;
-		_wwSessions.erase(sessionInfo.id);
+		_wwSessions.erase(sessionInfo.Id());
 	}
 }
 
 void WonsikWorldServer::ProcEnterGame_CS(SessionInfo sessionInfo, WString& nickName)
 {
-	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.id);
+	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
 	if (wwSession && wwSession->roomID == ROOM_ID_LOBBY)
 	{
 		_lobby->DoAsync(&WWLobby::EnterGame, wwSession, nickName);
@@ -188,7 +188,7 @@ void WonsikWorldServer::ProcEnterGame_CS(SessionInfo sessionInfo, WString& nickN
 
 void WonsikWorldServer::ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMapID, short afterMapID)
 {
-	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.id);
+	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
 	int beforeRoomID = beforeMapID;
 	int afterRoomID = afterMapID;
 	if (wwSession && wwSession->roomID == beforeRoomID && beforeRoomID>ROOM_ID_LOBBY)
@@ -203,7 +203,7 @@ void WonsikWorldServer::ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMa
 
 void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, short mapID, WString& chatMessage)
 {
-	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.id);
+	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
 	int roomID = mapID;
 	if (wwSession && wwSession->roomID == roomID && roomID > ROOM_ID_LOBBY)
 	{
@@ -218,7 +218,7 @@ void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, short ma
 
 void WonsikWorldServer::ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short mapID, float destinationX, float destinationY)
 {
-	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.id);
+	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
 	int roomID = mapID;
 	if (wwSession && wwSession->roomID == roomID && roomID > ROOM_ID_LOBBY)
 	{

@@ -92,6 +92,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  newPlayer->SetDirVec(DEFAULT_DIRX,DEFAULT_DIRY);
 	  newPlayer->sector.x = newLocation.first / SECTOR_SIZE + 1;
 	  newPlayer->sector.y = newLocation.second / SECTOR_SIZE + 1;
+	  newPlayer->Stop();
 
 	  //Log::LogOnConsole(Log::ERROR_LEVEL, "newPlayer ID:%d, roomID %d", newPlayer->GetPlayerID(), GetRoomID());
 	  //당사자와 주위 섹터 플레이어들 업데이트
@@ -127,7 +128,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 
 	  }
 
-	  _playerMap[sessionInfo.id] = newPlayer;
+	  _playerMap[sessionInfo.Id()] = newPlayer;
 	  _sectorMap[newPlayer->sector.y][newPlayer->sector.x].push_back(newPlayer);
   }
   else
@@ -143,7 +144,7 @@ int WWField::RequestEnter(SessionInfo sessionInfo)
 
 void WWField::OnLeave(SessionInfo sessionInfo)
 {
-	auto iter=_playerMap.find(sessionInfo.id);
+	auto iter=_playerMap.find(sessionInfo.Id());
 	if (iter != _playerMap.end())
 	{
 		WWPlayer* pPlayer = iter->second;
