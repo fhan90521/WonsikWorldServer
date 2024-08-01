@@ -5,6 +5,8 @@
 #include "WonsikWorldServer.h"
 #include "MyStlContainer.h"
 #include "MakeShared.h"
+#include "CCrashDump.h"
+CCrashDump gCrashDump;
 int main()
 {
 	WonsikWorldServer* pServer = new WonsikWorldServer;

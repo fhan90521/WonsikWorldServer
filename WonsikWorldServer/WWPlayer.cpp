@@ -68,6 +68,11 @@ bool WWPlayer::GetDestinations(Vector<float>& destinationXs, Vector<float>& dest
     return true;
 }
 
+void WWPlayer::Stop()
+{
+    _destinations.clear();
+}
+
 bool WWPlayer::IsMoving()
 {
     return _destinations.empty() == false;

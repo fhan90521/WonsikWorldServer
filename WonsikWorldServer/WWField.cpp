@@ -507,7 +507,28 @@ void WWField::SetCharacterDestination(SharedPtr<WWSession> wwSession, float dest
 	}
 	else
 	{
-		//길을 못찾으면 아무것도 안함 굳이 못찾았다는 패킷을 보내야 하는가? 그냥 플레이어가 클릭한곳이 이동못하는 곳이라는걸 알아서 인식하지 않을까
+		// 멈추고 움직이는 프로토콜을 사용할 때 쓰던 코드
+		// 길을 못찾으면 응답을 보내지는 않음 굳이 못찾았다는 패킷을 보내야 하는가? 그냥 플레이어가 클릭한곳이 이동못하는 곳이라는걸 알아서 인식하지 않을까
+		// 클라이언트가 멈추고 길찾기 요청을 하고 서버가 길을 못찾으면 멈추게되면 obstacle인 그리드에 멈추게 되는 일이 생겨 부자연스러운 모습이 많이일어나서 둘다 멈추지않음 
+		// 길을 못 찾았을 때는 아무일도 일어나지 않게함.
+		//if (pathPoints.size() == 1)
+		//{
+		//	//서버에서 obstacle에 끼었을 때
+		//	wwSession->wwPlayer->SetLocation(pathPoints.front());
+		//	destinationXs.push_back(pathPoints.front().first);
+		//	destinationYs.push_back(pathPoints.front().second);
+		//	destinationXs.push_back(pathPoints.front().first);
+		//	destinationYs.push_back(pathPoints.front().second);
+		//	List<SessionInfo> sessionInfoListInAroundSector;
+		//	GetSessionInfoInAroundSector(sessionInfoListInAroundSector, wwSession->wwPlayer, false);
+		//	_wwServer->MoveMyCharacter_SC(wwSession->sessionInfo, GetRoomID(), destinationXs, destinationYs);
+		//	_wwServer->MoveOtherCharacter_SC(sessionInfoListInAroundSector, GetRoomID(), wwSession->wwPlayer->GetPlayerID(), destinationXs, destinationYs);
+		//}
+		//else
+		//{
+		//	
+		//	//wwSession->wwPlayer->Stop();
+		//}
 	}
 }
 

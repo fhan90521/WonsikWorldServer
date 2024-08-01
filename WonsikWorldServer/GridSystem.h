@@ -57,7 +57,7 @@ private:
     Node* MakeNewNode(int x, int y, Node* pParentNode);
     void UpdateLists(int currentX, int currentY, Node* pParentNode);
     bool CheckObstacleOnLine(double beginX, double beginY, double endX, double endY);
-    bool CheckObstacleOnLineByBresenham(double beginX, double beginY, double endX, double endY);
+    bool CheckObstacleOnLineByBresenham(int beginX, int beginY, int endX, int endY);
     void FreeNodes();
 private:
     void JPSearch(List<std::pair<float, float>>& pathPoints);
@@ -82,5 +82,6 @@ public:
     bool IsObstacle(int x, int y);
     bool IsObstacleByFloat(const std::pair<float, float>& location);
     bool GetNotObstacleLocation(std::pair<float, float>& location);
+    bool GetNearNotObstacleLocation(float x, float y, std::pair<float, float>& location);
     bool FindPath(float startX, float startY, float endX, float endY, List<std::pair<float,float>>& pathPoints);
 };

@@ -40,7 +40,7 @@ void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
                     break;
                 }
                 Node* pPrevNode = pCurrentNode->pParent;
-                while (pPrevNode->pParent && CheckObstacleOnLineByBresenham(pPrevNode->pParent->x + 0.5, pPrevNode->pParent->y + 0.5, pCurrentNode->x + 0.5, pCurrentNode->y + 0.5))
+                while (pPrevNode->pParent && CheckObstacleOnLineByBresenham(pPrevNode->pParent->x, pPrevNode->pParent->y, pCurrentNode->x, pCurrentNode->y))
                 {
                     pPrevNode = pPrevNode->pParent;
                 }
@@ -253,6 +253,29 @@ bool GridSystem::GetNotObstacleLocation(std::pair<float, float>& location)
     }
     return ret;
 }
+bool GridSystem::GetNearNotObstacleLocation(float x, float y, std::pair<float, float>& location)
+{
+    bool ret = false;
+
+    int gridX = x / _cellSize + 1;
+    int gridY = y / _cellSize + 1;
+
+    for (int dy = -1; dy <= 1; dy++)
+    {
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            if (_obstacleMap[gridY+dy][gridX+dx] == false)
+            {
+                ret = true;
+                location.first = (gridX+dx) * _cellSize - _cellSize / 2;
+                location.second = (gridY+dy) * _cellSize - _cellSize / 2;
+                break;
+            }
+        }
+    }
+
+    return ret;
+}
 bool GridSystem::FindPath(float startX, float startY, float endX, float endY, List<std::pair<float, float>>& pathPoints)
 {
     pathPoints.clear();
@@ -270,6 +293,16 @@ bool GridSystem::FindPath(float startX, float startY, float endX, float endY, Li
 
     if (_obstacleMap[_startY][_startX] == true)
     {
+        // 멈추고 움직이는 프로토콜을 사용할 때 사용하는 코드
+        /*std::pair<float, float> notObstacleLocation;
+        if (GetNearNotObstacleLocation(startX, startY, notObstacleLocation)==true)
+        {
+            pathPoints.push_back(notObstacleLocation);
+            return false;
+        }
+
+        GetNotObstacleLocation(notObstacleLocation);
+        pathPoints.push_back(notObstacleLocation);*/
         return false;
     }
 
@@ -708,7 +741,7 @@ GridSystem::~GridSystem()
     }
     delete[] _obstacleMap;
 }
-bool GridSystem::CheckObstacleOnLineByBresenham(double beginX, double beginY, double endX, double endY)
+bool GridSystem::CheckObstacleOnLineByBresenham(int beginX, int beginY, int endX, int endY)
 {
     int difX = abs(beginX - endX);
     int difY = abs(beginY - endY);

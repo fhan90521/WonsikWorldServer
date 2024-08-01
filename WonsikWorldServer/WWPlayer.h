@@ -18,6 +18,7 @@ public:
 	void SetDestinations(const List<std::pair<float, float>>& destinations,bool bIgnoreFirst);
 	bool GetDestination(std::pair<float, float>& destination);
 	bool GetDestinations(Vector<float>& destinationXs, Vector<float>& destinationYs);
+	void Stop();
 	bool IsMoving();
 	void SetSessionInfo(SessionInfo sessionInfo);
 	SessionInfo GetSessionInfo();
