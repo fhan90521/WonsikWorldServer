@@ -27,6 +27,11 @@ private:
 	virtual void OnRecv(SessionInfo sessionInfo, CRecvBuffer& buf) override;
 
 private:
+	std::atomic<int> _moveCharacterCnt = 0;
+	std::atomic<int> _enterGameCnt = 0;
+	std::atomic<int> _changeMapCnt = 0;
+	std::atomic<int> _sendChatMessageCnt = 0;
+
 	virtual void ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short mapID, float destinationX, float destinationY) override;
 	virtual void ProcHeartBeat_CS(SessionInfo sessionInfo);
 	virtual void ProcEnterGame_CS(SessionInfo sessionInfo, WString& nickName) override;

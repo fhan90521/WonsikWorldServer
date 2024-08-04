@@ -33,9 +33,9 @@ void WWField::PrintFieldStatus()
 {
 	std::cout << std::format(R"(
 --Field {} Status
-PlayerNum: {}                                 
-UpdateTps: {}
-)",GetRoomID(), _playerMap.size(), GetUpdateCnt());
+PlayerNum: {} ,UpdateTps: {}, SectorUpdateTps: {}
+)",GetRoomID(), _playerMap.size(), GetUpdateCnt(), _sectorUpdateCnt.load());
+	_sectorUpdateCnt = 0;
 
 }
 
@@ -48,6 +48,7 @@ void WWField::Update(float deltaTime)
 		wwPlayer->Move(deltaTime);
 		if (CheckSectorUpdate(wwPlayer) == true)
 		{
+			_sectorUpdateCnt++;
 			UpdateSectorAround(wwPlayer);
 		}
 	}

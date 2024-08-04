@@ -53,17 +53,19 @@ void WonsikWorldServer::PrintServerStatus()
 {
 	std::cout << std::format(R"(
 -------------------------------------
-SessionNum: {}                                 
-Accept Tps: {}
-RecvMessageTps: {}
-SendMessageTps: {}
+SessionNum: {}          Accept Tps: {}      RecvMessageTps: {}   SendMessageTps: {}
 
-)", GetConnectingSessionCnt(), GetAcceptCnt(),GetRecvCnt(), GetSendCnt());
-
-	_monitor.PrintMonitorData();
+MoveCharacterJobTps: {}    EnterGameJobTps: {}    ChangeMapJobTps: {}     SendChatMessageJobTps: {}
+)", GetConnectingSessionCnt(), GetAcceptCnt(),GetRecvCnt(), GetSendCnt(),_moveCharacterCnt.load(),_enterGameCnt.load(),_changeMapCnt.load(),_sendChatMessageCnt.load());
+	
+	_moveCharacterCnt = 0;
+	_enterGameCnt = 0;
+	_changeMapCnt = 0;
+	_sendChatMessageCnt = 0;
 	_lobby->PrintLobbyStatus();
 	_fields[ROOM_ID_FIELD1]->PrintFieldStatus();
 	_fields[ROOM_ID_FIELD2]->PrintFieldStatus();
+	_monitor.PrintMonitorData();
 }
 
 bool WonsikWorldServer::OnAcceptRequest(const char* ip, USHORT port)
@@ -178,6 +180,7 @@ void WonsikWorldServer::ProcEnterGame_CS(SessionInfo sessionInfo, WString& nickN
 	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
 	if (wwSession && wwSession->roomID == ROOM_ID_LOBBY)
 	{
+		_enterGameCnt++;
 		_lobby->DoAsync(&WWLobby::EnterGame, wwSession, nickName);
 	}
 	else
@@ -193,6 +196,7 @@ void WonsikWorldServer::ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMa
 	int afterRoomID = afterMapID;
 	if (wwSession && wwSession->roomID == beforeRoomID && beforeRoomID>ROOM_ID_LOBBY)
 	{
+		_changeMapCnt++;
 		_fields[beforeRoomID]->DoAsync(&WWField::ChangeField, wwSession, afterRoomID);
 	}
 	else
@@ -207,6 +211,7 @@ void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, short ma
 	int roomID = mapID;
 	if (wwSession && wwSession->roomID == roomID && roomID > ROOM_ID_LOBBY)
 	{
+		_sendChatMessageCnt++;
 		_fields[wwSession->roomID]->DoAsync(&WWField::SendChatMessage, wwSession, chatMessage);
 	}
 	else
@@ -222,6 +227,7 @@ void WonsikWorldServer::ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short ma
 	int roomID = mapID;
 	if (wwSession && wwSession->roomID == roomID && roomID > ROOM_ID_LOBBY)
 	{
+		_moveCharacterCnt++;
 		_fields[wwSession->roomID]->DoAsync(&WWField::SetCharacterDestination, wwSession, destinationX, destinationY);
 	}
 	else
