@@ -15,5 +15,5 @@ struct WWSession
 	SessionType sessionType;
 	int roomID;
 	class WWPlayer* wwPlayer;
-	virtual ~WWSession();
+	~WWSession();
 };

@@ -13,7 +13,6 @@ public:
 	std::atomic<int> _sectorUpdateCnt = 0;
 	void PrintFieldStatus();
 private:
-	//Update에서 순차적으로 돌면서 move를 시켜야함으로 PLAYER_MAP이나 SET이 필요하다.
 	HashMap<SessionInfo::ID, class WWPlayer*> _playerMap;
 	GridSystem _gridSystem;
 	class WonsikWorldServer* _wwServer;
