@@ -42,7 +42,7 @@ PlayerNum: {} ,UpdateTps: {}, SectorUpdateTps: {}
 void WWField::Update(float deltaTime)
 {
 	
-	for (const std::pair<SessionInfo::ID,WWPlayer*>& tempPair : _playerMap)
+	for (const auto& tempPair : _playerMap)
 	{
 		WWPlayer* wwPlayer=tempPair.second;
 		wwPlayer->Move(deltaTime);
