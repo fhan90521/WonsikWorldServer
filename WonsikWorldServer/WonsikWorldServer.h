@@ -45,7 +45,7 @@ private:
 	HashMap<SessionInfo::ID, SharedPtr<struct WWSession>> _wwSessions;
 private:
 	HANDLE _hShutDownEvent;
-	std::jthread* _checkRecvTimeThread;
+	std::thread* _checkRecvTimeThread;
 	void CheckLastRecvTime();
 	void CreateWWSession(SessionInfo sessionInfo);
 public:

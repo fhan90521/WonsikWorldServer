@@ -23,7 +23,7 @@ WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("
 	if (LAST_RECV_TIME_OUT != 0)
 	{
 		_hShutDownEvent = CreateEvent(NULL, TRUE, false, NULL);
-		_checkRecvTimeThread = new std::jthread(&WonsikWorldServer::CheckLastRecvTime, this);
+		_checkRecvTimeThread = new std::thread(&WonsikWorldServer::CheckLastRecvTime, this);
 	}
 }
 
