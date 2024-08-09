@@ -28,6 +28,7 @@ public:
 	void SetDirVec(float x, float y);
 	std::pair<float, float> GetDirVec();
 
+	void Tick(float deltaTime);
 	void Move(float deltaTime);
 public:
 	//복사를 줄이기 위해

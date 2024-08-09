@@ -115,6 +115,11 @@ std::pair<float, float> WWPlayer::GetDirVec()
 }
 
 
+void WWPlayer::Tick(float deltaTime)
+{
+    Move(deltaTime);
+}
+
 void WWPlayer::Move(float deltaTime)
 {
     if (_destinations.size()>0)

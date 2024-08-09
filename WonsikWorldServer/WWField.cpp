@@ -45,7 +45,7 @@ void WWField::Update(float deltaTime)
 	for (const auto& tempPair : _playerMap)
 	{
 		WWPlayer* wwPlayer=tempPair.second;
-		wwPlayer->Move(deltaTime);
+		wwPlayer->Tick(deltaTime);
 		if (CheckSectorUpdate(wwPlayer) == true)
 		{
 			_sectorUpdateCnt++;
