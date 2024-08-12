@@ -155,6 +155,7 @@
     <ClCompile Include="WWField.cpp" />
     <ClCompile Include="WWLobby.cpp" />
     <ClCompile Include="WWPlayer.cpp" />
+    <ClCompile Include="WWRoomSystem.cpp" />
     <ClCompile Include="WWSession.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +172,7 @@
     <ClInclude Include="WWPlayer.h" />
     <ClInclude Include="WWSession.h" />
     <ClInclude Include="MathUtil.h" />
+    <ClInclude Include="WWRoomSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WWServerSet.json" />

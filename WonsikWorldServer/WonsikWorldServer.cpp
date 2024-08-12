@@ -7,16 +7,17 @@
 #include "WWPlayer.h"
 #include "WWField.h"
 #include "MapSource.h"
+#include "WWRoomSystem.h"
 #include <iostream>
 #include <format>
-WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("WWServerSet.Json"),_wwRoomSystem(this)
+WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("WWServerSet.Json"),_wwRoomSystem(new WWRoomSystem(this))
 {
 	_lobby = MakeShared<WWLobby>(this);
 	_fields[ROOM_ID_FIELD1] = MakeShared<WWField>(this);
 	_fields[ROOM_ID_FIELD2] = MakeShared<WWField>(this);
-	_wwRoomSystem.RegisterRoom(_lobby);
-	_wwRoomSystem.RegisterRoom(_fields[ROOM_ID_FIELD1]);
-	_wwRoomSystem.RegisterRoom(_fields[ROOM_ID_FIELD2]);
+	_wwRoomSystem->RegisterRoom(_lobby);
+	_wwRoomSystem->RegisterRoom(_fields[ROOM_ID_FIELD1]);
+	_wwRoomSystem->RegisterRoom(_fields[ROOM_ID_FIELD2]);
 	_fields[ROOM_ID_FIELD1]->InitMap(map1);
 	_fields[ROOM_ID_FIELD2]->InitMap(map2);
 
@@ -39,9 +40,9 @@ WonsikWorldServer::~WonsikWorldServer()
 
 
 	CloseServer();
-	_wwRoomSystem.DeregisterRoom(ROOM_ID_LOBBY);
-	_wwRoomSystem.DeregisterRoom(ROOM_ID_FIELD1);
-	_wwRoomSystem.DeregisterRoom(ROOM_ID_FIELD2);
+	_wwRoomSystem->DeregisterRoom(ROOM_ID_LOBBY);
+	_wwRoomSystem->DeregisterRoom(ROOM_ID_FIELD1);
+	_wwRoomSystem->DeregisterRoom(ROOM_ID_FIELD2);
 }
 
 void WonsikWorldServer::Run()
@@ -53,10 +54,10 @@ void WonsikWorldServer::PrintServerStatus()
 {
 	std::cout << std::format(R"(
 -------------------------------------
-SessionNum: {}          Accept Tps: {}      RecvMessageTps: {}   SendMessageTps: {}
+SessionNum: {}		Accept Tps: {}      RecvMessageTps: {}   SendMessageTps: {}
 
 MoveCharacterJobTps: {}    EnterGameJobTps: {}    ChangeMapJobTps: {}     SendChatMessageJobTps: {}
-)", GetConnectingSessionCnt(), GetAcceptCnt(),GetRecvCnt(), GetSendCnt(),_moveCharacterCnt.load(),_enterGameCnt.load(),_changeMapCnt.load(),_sendChatMessageCnt.load());
+)", GetWWSessionCnt(), GetAcceptCnt(), GetRecvCnt(), GetSendCnt(), _moveCharacterCnt.load(), _enterGameCnt.load(), _changeMapCnt.load(), _sendChatMessageCnt.load());
 	
 	_moveCharacterCnt = 0;
 	_enterGameCnt = 0;
@@ -86,7 +87,7 @@ void WonsikWorldServer::OnDisconnect(SessionInfo sessionInfo)
 	{
 		_lobby->DoAsync(&WWLobby::LeaveGame,wwSession);
 	}
-	_wwRoomSystem.LeaveRoomSystem(sessionInfo);	
+	_wwRoomSystem->LeaveRoomSystem(sessionInfo);	
 }
 
 void WonsikWorldServer::OnRecv(SessionInfo sessionInfo, CRecvBuffer& buf)
@@ -121,6 +122,16 @@ SharedPtr<WWSession> WonsikWorldServer::GetWWSession(SessionInfo sessionInfo)
 	}
 }
 
+int WonsikWorldServer::GetWWSessionCnt()
+{
+	int ret = 0;
+	{
+		SHARED_LOCK;
+		ret = _wwSessions.size();
+	}
+	return ret;
+}
+
 void WonsikWorldServer::CheckLastRecvTime()
 {
 	while (1)
@@ -151,7 +162,7 @@ void WonsikWorldServer::CheckLastRecvTime()
 void WonsikWorldServer::CreateWWSession(SessionInfo sessionInfo)
 {
 	
-	bool enterResult = _wwRoomSystem.EnterRoomSystem(sessionInfo, ROOM_ID_LOBBY);
+	bool enterResult = _wwRoomSystem->EnterRoomSystem(sessionInfo, ROOM_ID_LOBBY);
 	if(enterResult == true)
 	{
 		EXCLUSIVE_LOCK;

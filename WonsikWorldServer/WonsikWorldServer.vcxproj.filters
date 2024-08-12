@@ -48,6 +48,9 @@
     <ClCompile Include="WonsikWorldServerStub.cpp">
       <Filter>RPC</Filter>
     </ClCompile>
+    <ClCompile Include="WWRoomSystem.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WonsikWorldServer.h">
@@ -88,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="WonsikWorldServerStub.h">
       <Filter>RPC</Filter>
+    </ClInclude>
+    <ClInclude Include="WWRoomSystem.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

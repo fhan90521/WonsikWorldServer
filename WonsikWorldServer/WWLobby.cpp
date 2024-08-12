@@ -44,7 +44,6 @@ void WWLobby::OnLeaveRoomSystem(SessionInfo sessionInfo)
 	_wwServer->DeleteWWSession(sessionInfo);
 }
 
-
 void WWLobby::EnterGame(SharedPtr<WWSession>& wwSession, WString& nickName)
 {
 	if (wwSession->sessionType != SessionType::GUEST)

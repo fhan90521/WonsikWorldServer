@@ -38,7 +38,7 @@ private:
 	virtual void ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMapID, short afterMapID) override;
 	virtual void ProcSendChatMessage_CS(SessionInfo sessionInfo, short mapID, WString& chatMessage) override;	
 private:
-	RoomSystem _wwRoomSystem;
+	class WWRoomSystem* _wwRoomSystem;
 	SharedPtr<class WWLobby> _lobby;
 	Array<SharedPtr<class WWField>,3> _fields;
 	USE_LOCK;
@@ -48,7 +48,9 @@ private:
 	std::thread* _checkRecvTimeThread;
 	void CheckLastRecvTime();
 	void CreateWWSession(SessionInfo sessionInfo);
+	int GetWWSessionCnt();
 public:
 	SharedPtr<struct WWSession> GetWWSession(SessionInfo sessionInfo);
 	void DeleteWWSession(SessionInfo sessionInfo);
+
 };
