@@ -93,7 +93,7 @@ void WonsikWorldServer::OnRecv(SessionInfo sessionInfo, CRecvBuffer& buf)
 {
 	if (PacketProc(sessionInfo, buf) == false)
 	{
-		Log::LogOnFile(Log::SYSTEM_LEVEL, "OnRecv Error\n");
+		Log::LogOnFile(Log::DEBUG_LEVEL, "OnRecv Error\n");
 		Disconnect(sessionInfo);
 	}
 	else
@@ -186,6 +186,7 @@ void WonsikWorldServer::ProcEnterGame_CS(SessionInfo sessionInfo, WString& nickN
 	else
 	{
 		Disconnect(sessionInfo);
+		Log::LogOnFile(Log::DEBUG_LEVEL, "ProcEnterGame_CS roomid Error\n");
 	}
 }
 
@@ -202,6 +203,7 @@ void WonsikWorldServer::ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMa
 	else
 	{
 		Disconnect(sessionInfo);
+		Log::LogOnFile(Log::DEBUG_LEVEL, "ProcChangeMap_CS roomid Error\n");
 	}
 }
 
@@ -217,6 +219,7 @@ void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, short ma
 	else
 	{
 		Disconnect(sessionInfo);
+		Log::LogOnFile(Log::DEBUG_LEVEL, "ProcSendChatMessage_CS roomid Error\n");
 	}
 
 }
@@ -233,6 +236,7 @@ void WonsikWorldServer::ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short ma
 	else
 	{
 		Disconnect(sessionInfo);
+		Log::LogOnFile(Log::DEBUG_LEVEL, "ProcMoveMyCharacter_CS roomid Error\n");
 	}
 }
 
