@@ -1,6 +1,5 @@
 #pragma once
 #include "MyStlContainer.h"
-#include "Sector.h"
 #include "Session.h"
 class WWPlayer
 {
@@ -35,6 +34,11 @@ public:
 	void Tick(float deltaTime);
 	void Move(float deltaTime);
 //섹터처리
+private:
+	std::pair<int, int> _sectorPosition;
 public:
-	SECTOR_POS sector;
+	void SetSectorPosition(int iX, int iY);
+	std::pair<int, int> GetSectorPosition();
+	int GetSectorX();
+	int GetSectorY();
 };

@@ -90,22 +90,21 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  //player Init
 	  newPlayer->SetLocation(newLocation);
 	  newPlayer->SetDirVec(DEFAULT_DIRX,DEFAULT_DIRY);
-	  newPlayer->sector.x = newLocation.first / SECTOR_SIZE + 1;
-	  newPlayer->sector.y = newLocation.second / SECTOR_SIZE + 1;
+	  newPlayer->SetSectorPosition(newLocation.first / SECTOR_SIZE + 1, newLocation.second / SECTOR_SIZE + 1);
 	  newPlayer->Stop();
 
 	  //Log::LogOnConsole(Log::ERROR_LEVEL, "newPlayer ID:%d, roomID %d", newPlayer->GetPlayerID(), GetRoomID());
 	  //당사자와 주위 섹터 플레이어들 업데이트
 	  _wwServer->CreateMyCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), DEFAULT_DIRX, DEFAULT_DIRY, newLocation.first, newLocation.second);
 
-	  SECTOR_AROUND aroundSector;
-	  GetSectorAround(newPlayer, aroundSector);
+	  SectorAround sectorAround;
+	  GetSectorAround(newPlayer, sectorAround);
 
 
-	  for (int i = 0; i < aroundSector.cnt; i++)
+	  for (int i = 0; i < sectorAround.cnt; i++)
 	  {
 
-		  for (WWPlayer* pPlayer : _sectorMap[aroundSector.around[i].y][aroundSector.around[i].x])
+		  for (WWPlayer* pPlayer : _sectorMap[sectorAround.around[i].second][sectorAround.around[i].first])
 		  {
 			  if (pPlayer->GetPlayerID() == newPlayer->GetPlayerID())
 			  {
@@ -129,7 +128,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  }
 
 	  _playerMap[sessionInfo.Id()] = newPlayer;
-	  _sectorMap[newPlayer->sector.y][newPlayer->sector.x].push_back(newPlayer);
+	  _sectorMap[newPlayer->GetSectorY()][newPlayer->GetSectorX()].push_back(newPlayer);
   }
   else
   {
@@ -149,15 +148,15 @@ void WWField::OnLeave(SessionInfo sessionInfo)
 	{
 		WWPlayer* pPlayer = iter->second;
 		_playerMap.erase(iter);
-		_sectorMap[pPlayer->sector.y][pPlayer->sector.x].remove(pPlayer);
+		_sectorMap[pPlayer->GetSectorY()][pPlayer->GetSectorX()].remove(pPlayer);
 
 		//Log::LogOnConsole(Log::ERROR_LEVEL, "removePlayer ID:%d, roomID %d", pPlayer->GetPlayerID(), GetRoomID());
-		SECTOR_AROUND aroundSector;
-		GetSectorAround(pPlayer, aroundSector);
+		SectorAround sectorAround;
+		GetSectorAround(pPlayer, sectorAround);
 
-		for (int i = 0; i < aroundSector.cnt; i++)
+		for (int i = 0; i < sectorAround.cnt; i++)
 		{
-			for (WWPlayer* pAroundPlayer : _sectorMap[aroundSector.around[i].y][aroundSector.around[i].x])
+			for (WWPlayer* pAroundPlayer : _sectorMap[sectorAround.around[i].second][sectorAround.around[i].first])
 			{
 				_wwServer->DeleteCharacter_SC(pAroundPlayer->GetSessionInfo(),GetRoomID(), pPlayer->GetPlayerID());
 			}
@@ -172,22 +171,24 @@ void WWField::OnLeaveRoomSystem(SessionInfo sessionInfo)
 	_wwServer->DeleteWWSession(sessionInfo);
 }
 
-void WWField::GetSectorAround(WWPlayer* wwPlayer, SECTOR_AROUND& sectorAround)
+void WWField::GetSectorAround(WWPlayer* wwPlayer, SectorAround& sectorAround)
 {
 	int index = 0;
+	int sectorX = wwPlayer->GetSectorX();
+	int sectorY = wwPlayer->GetSectorY();
 	for (int dY = -1; dY <= 1; dY++)
 	{
 		for (int dX = -1; dX <= 1; dX++)
 		{
-			sectorAround.around[index].x = wwPlayer->sector.x + dX;
-			sectorAround.around[index].y = wwPlayer->sector.y + dY;
+			sectorAround.around[index].first = sectorX + dX;
+			sectorAround.around[index].second = sectorY + dY;
 			index++;
 		}
 	}
 	sectorAround.cnt = 9;
 }
 
-void WWField::GetSectorAround(int x, int y, SECTOR_AROUND& sectorAround)
+void WWField::GetSectorAround(int x, int y, SectorAround& sectorAround)
 {
 
 	int index = 0;
@@ -195,68 +196,70 @@ void WWField::GetSectorAround(int x, int y, SECTOR_AROUND& sectorAround)
 	{
 		for (int dX = -1; dX <= 1; dX++)
 		{
-			sectorAround.around[index].x = x + dX;
-			sectorAround.around[index].y = y + dY;
+			sectorAround.around[index].first = x + dX;
+			sectorAround.around[index].second = y + dY;
 			index++;
 		}
 	}
 	sectorAround.cnt = 9;
 }
 
-void WWField::GetUpdateSectorAround(WWPlayer* wwPlayer, SECTOR_AROUND& removeSector, SECTOR_AROUND& addSector)
+void WWField::GetUpdateSectorAround(WWPlayer* wwPlayer, SectorAround& removeSector, SectorAround& addSector)
 {
 	auto location = wwPlayer->GetLocation();
 	int currentSectorX = location.first/ SECTOR_SIZE + 1;
 	int currentSectorY = location.second / SECTOR_SIZE + 1;
-	int dX = currentSectorX - wwPlayer->sector.x;
-	int dY = currentSectorY - wwPlayer->sector.y;
+	int prevSectorX = wwPlayer->GetSectorX();
+	int prevSectorY = wwPlayer->GetSectorY();
+	int dX = currentSectorX - prevSectorX;
+	int dY = currentSectorY - prevSectorY;
 
 	if (dX == 1 && dY == 0)
 	{
 		//RR
-		GetUpdateSectorByDir(wwPlayer->sector.x, wwPlayer->sector.y, removeSector, removeRR, NON_DIAGONOL_DELTA_SECTOR);
+		GetUpdateSectorByDir(prevSectorX, prevSectorY, removeSector, removeRR, NON_DIAGONOL_DELTA_SECTOR);
 		GetUpdateSectorByDir(currentSectorX, currentSectorY, addSector, addRR, NON_DIAGONOL_DELTA_SECTOR);
 	}
 	else if (dX == 1 && dY == -1)
 	{
 		//RD
-		GetUpdateSectorByDir(wwPlayer->sector.x, wwPlayer->sector.y,removeSector, removeRD, DIAGONOL_DELTA_SECTOR);
+		GetUpdateSectorByDir(prevSectorX, prevSectorY,removeSector, removeRD, DIAGONOL_DELTA_SECTOR);
 		GetUpdateSectorByDir(currentSectorX, currentSectorY, addSector, addRD, DIAGONOL_DELTA_SECTOR);
 	}
 	else if (dX == 0 && dY == -1)
 	{
 		//DD
-		GetUpdateSectorByDir(wwPlayer->sector.x, wwPlayer->sector.y, removeSector, removeDD, NON_DIAGONOL_DELTA_SECTOR);
+		GetUpdateSectorByDir(prevSectorX, prevSectorY, removeSector, removeDD, NON_DIAGONOL_DELTA_SECTOR);
 		GetUpdateSectorByDir(currentSectorX, currentSectorY, addSector, addDD, NON_DIAGONOL_DELTA_SECTOR);
 	}
 	else if (dX == -1 && dY == -1)
 	{
 		//LD
-		GetUpdateSectorByDir(wwPlayer->sector.x, wwPlayer->sector.y, removeSector, removeLD, DIAGONOL_DELTA_SECTOR);
+		GetUpdateSectorByDir(prevSectorX, prevSectorY, removeSector, removeLD, DIAGONOL_DELTA_SECTOR);
 		GetUpdateSectorByDir(currentSectorX, currentSectorY, addSector, addLD, DIAGONOL_DELTA_SECTOR);
 	}
 	else if (dX == -1 && dY == 0)
 	{
 		//LL
-		GetUpdateSectorByDir(wwPlayer->sector.x, wwPlayer->sector.y, removeSector, removeLL, NON_DIAGONOL_DELTA_SECTOR);
+		GetUpdateSectorByDir(prevSectorX, prevSectorY, removeSector, removeLL, NON_DIAGONOL_DELTA_SECTOR);
 		GetUpdateSectorByDir(currentSectorX, currentSectorY, addSector, addLL, NON_DIAGONOL_DELTA_SECTOR);
 	}
 	else if (dX == -1 && dY == 1)
 	{
 		//LU
-		GetUpdateSectorByDir(wwPlayer->sector.x, wwPlayer->sector.y, removeSector, removeLU, DIAGONOL_DELTA_SECTOR);
+		GetUpdateSectorByDir(prevSectorX, prevSectorY, removeSector, removeLU, DIAGONOL_DELTA_SECTOR);
 		GetUpdateSectorByDir(currentSectorX, currentSectorY, addSector, addLU, DIAGONOL_DELTA_SECTOR);
 	}
 	else if (dX == 0 && dY == 1)
 	{
 		//UU
-		GetUpdateSectorByDir(wwPlayer->sector.x, wwPlayer->sector.y, removeSector, removeUU, NON_DIAGONOL_DELTA_SECTOR);
+		GetUpdateSectorByDir(prevSectorX, prevSectorY, removeSector, removeUU, NON_DIAGONOL_DELTA_SECTOR);
 		GetUpdateSectorByDir(currentSectorX, currentSectorY, addSector, addUU, NON_DIAGONOL_DELTA_SECTOR);
 	}
 	else if (dX == 1 && dY == 1)
 	{
 		//RU
-		GetUpdateSectorByDir(wwPlayer->sector.x, wwPlayer->sector.y, removeSector, removeRU, DIAGONOL_DELTA_SECTOR);
+		GetUpdateSectorByDir(prevSectorX, prevSectorY, removeSector, removeRU, DIAGONOL_DELTA_SECTOR);
 		GetUpdateSectorByDir(currentSectorX, currentSectorY, addSector, addRU, DIAGONOL_DELTA_SECTOR);
 	}
 	else
@@ -271,36 +274,36 @@ void WWField::GetUpdateSectorAround(WWPlayer* wwPlayer, SECTOR_AROUND& removeSec
 		else
 		{
 			//섹터를 두칸 뛰었을때 그냥 포문돌면서 전부 체크
-			GetUpdateSectorByAllCheck(wwPlayer->sector.x, wwPlayer->sector.y, currentSectorX, currentSectorY, removeSector, addSector);
+			GetUpdateSectorByAllCheck(prevSectorX, prevSectorY, currentSectorX, currentSectorY, removeSector, addSector);
 		}
 	}
 
-	_sectorMap[wwPlayer->sector.y][wwPlayer->sector.x].remove(wwPlayer);
-	wwPlayer->sector.x = currentSectorX;
-	wwPlayer->sector.y = currentSectorY;
-	_sectorMap[wwPlayer->sector.y][wwPlayer->sector.x].push_back(wwPlayer);
+	_sectorMap[prevSectorY][prevSectorX].remove(wwPlayer);
+	_sectorMap[currentSectorY][currentSectorX].push_back(wwPlayer);
+	wwPlayer->SetSectorPosition(currentSectorX, currentSectorY);
 }
 
-void WWField::GetUpdateSectorByDir(int x, int y, SECTOR_AROUND& sectorAround, const int* dxdyIndexArray, int arrayLen)
+void WWField::GetUpdateSectorByDir(int x, int y, SectorAround& sectorAround, const int* dxdyIndexArray, int arrayLen)
 {
 	for (int i = 0; i < arrayLen; i++)
 	{
-		sectorAround.around[i].x = x + dXdY[dxdyIndexArray[i]][0];
-		sectorAround.around[i].y = y + dXdY[dxdyIndexArray[i]][1];
+		sectorAround.around[i].first = x + dXdY[dxdyIndexArray[i]][0];
+		sectorAround.around[i].second = y + dXdY[dxdyIndexArray[i]][1];
 	}
 	sectorAround.cnt = arrayLen;
 }
 
-void WWField::GetUpdateSectorByAllCheck(int beforeSectorX, int beforeSectorY, int afterSectorX, int afterSectorY, SECTOR_AROUND& removeSector, SECTOR_AROUND& addSector)
+void WWField::GetUpdateSectorByAllCheck(int beforeSectorX, int beforeSectorY, int afterSectorX, int afterSectorY, SectorAround& removeSector, SectorAround& addSector)
 {
-	Vector<SECTOR_POS> beforeAroundSectors;
-	Vector<SECTOR_POS> afterAroundSectors;
+	using std::pair;
+	Vector<pair<int,int>> beforeAroundSectors;
+	Vector<pair<int,int>> afterAroundSectors;
 	for (int iY = -1; iY <= 1; iY++)
 	{
 		for (int iX = -1; iX <= 1; iX++)
 		{
-			beforeAroundSectors.push_back(SECTOR_POS(beforeSectorX + iX, beforeSectorY + iY));
-			afterAroundSectors.push_back(SECTOR_POS(afterSectorX + iX, afterSectorY + iY));
+			beforeAroundSectors.push_back(pair<int, int>(beforeSectorX + iX, beforeSectorY + iY));
+			afterAroundSectors.push_back(pair<int, int>(afterSectorX + iX, afterSectorY + iY));
 		}
 	}
 
@@ -308,22 +311,22 @@ void WWField::GetUpdateSectorByAllCheck(int beforeSectorX, int beforeSectorY, in
 	{
 		bool IsBeforeComparingSectorRemoveSector = true;
 		bool IsAfterComparingSectorAddSector = true;
-		SECTOR_POS beforeComparingSector = beforeAroundSectors[comparingIndex];
-		SECTOR_POS afterComparingSector = afterAroundSectors[comparingIndex];
+		pair<int, int> beforeComparingSector = beforeAroundSectors[comparingIndex];
+		pair<int, int> afterComparingSector = afterAroundSectors[comparingIndex];
 		for (int i = 0; i < beforeAroundSectors.size(); i++)
 		{
-			if (beforeComparingSector.x == afterAroundSectors[i].x && beforeComparingSector.y == afterAroundSectors[i].y)
+			if (beforeComparingSector.first == afterAroundSectors[i].first && beforeComparingSector.second == afterAroundSectors[i].second)
 			{
 				IsBeforeComparingSectorRemoveSector = false;
 			}
 
-			if (afterComparingSector.x == beforeAroundSectors[i].x && afterComparingSector.y == beforeAroundSectors[i].y)
+			if (afterComparingSector.first == beforeAroundSectors[i].first && afterComparingSector.second == beforeAroundSectors[i].second)
 			{
 				IsAfterComparingSectorAddSector = false;
 			}
 			//if (IsBeforeComparingSectorRemoveSector == false && IsAfterComparingSectorAddSector == false)
 			//{
-			//	//두칸이상 뛰어서 대부분 안걸림
+			//	//두칸이상 뛰었을 때라 대부분 안걸림
 			//	break;
 			//}
 		}
@@ -341,11 +344,11 @@ void WWField::GetUpdateSectorByAllCheck(int beforeSectorX, int beforeSectorY, in
 
 void WWField::GetSessionInfoInAroundSector(List<SessionInfo>& sessionInfoListInAroundSector, WWPlayer* wwPlayer, bool bIncludeSelf)
 {
-	SECTOR_AROUND sectorAround;
+	SectorAround sectorAround;
 	GetSectorAround(wwPlayer, sectorAround);
 	for (int i = 0; i < sectorAround.cnt; i++)
 	{
-		for (WWPlayer* aroundPlayer : _sectorMap[sectorAround.around[i].y][sectorAround.around[i].x])
+		for (WWPlayer* aroundPlayer : _sectorMap[sectorAround.around[i].second][sectorAround.around[i].first])
 		{
 			if (bIncludeSelf == true)
 			{
@@ -367,7 +370,7 @@ bool WWField::CheckSectorUpdate(WWPlayer* wwPlayer)
 	auto location = wwPlayer->GetLocation();
 	int currentSectorX = location.first / SECTOR_SIZE + 1;
 	int currentSectorY = location.second / SECTOR_SIZE + 1;
-	if (currentSectorX != wwPlayer->sector.x || currentSectorY != wwPlayer->sector.y)
+	if (currentSectorX != wwPlayer->GetSectorX() || currentSectorY != wwPlayer->GetSectorY())
 	{
 		return true;
 	}
@@ -376,13 +379,13 @@ bool WWField::CheckSectorUpdate(WWPlayer* wwPlayer)
 
 void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 {
-	SECTOR_AROUND removeSector;
-	SECTOR_AROUND addSector;
+	SectorAround removeSector;
+	SectorAround addSector;
 	GetUpdateSectorAround(wwPlayer, removeSector, addSector);
 
 	for (int i = 0; i < removeSector.cnt; i++)
 	{
-		for (WWPlayer* pRemovePlayer : _sectorMap[removeSector.around[i].y][removeSector.around[i].x])
+		for (WWPlayer* pRemovePlayer : _sectorMap[removeSector.around[i].second][removeSector.around[i].first])
 		{
 			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayerId :%d, wwPlayerX: %f wwPlayerY: %f, removePlayerID: %d, removeX : %f removeY: %f\n", wwPlayer->GetPlayerID(), wwPlayer->GetLocation().first, wwPlayer->GetLocation().second, pRemovePlayer->GetPlayerID(), pRemovePlayer->GetLocation().first, pRemovePlayer->GetLocation().second);
 			if (pRemovePlayer->GetPlayerID() != wwPlayer->GetPlayerID())
@@ -404,7 +407,7 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 	
 	for (int i = 0; i < addSector.cnt; i++)
 	{
-		for (WWPlayer* pAddPlayer : _sectorMap[addSector.around[i].y][addSector.around[i].x])
+		for (WWPlayer* pAddPlayer : _sectorMap[addSector.around[i].second][addSector.around[i].first])
 		{
 			if (wwPlayer->GetPlayerID() == pAddPlayer->GetPlayerID())
 			{

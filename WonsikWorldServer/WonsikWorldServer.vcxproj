@@ -170,7 +170,6 @@
     <ClInclude Include="WWLobby.h" />
     <ClInclude Include="WWPlayer.h" />
     <ClInclude Include="WWSession.h" />
-    <ClInclude Include="Sector.h" />
     <ClInclude Include="MathUtil.h" />
   </ItemGroup>
   <ItemGroup>

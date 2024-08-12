@@ -164,3 +164,24 @@ void WWPlayer::Move(float deltaTime)
 
     }
 }
+
+void WWPlayer::SetSectorPosition(int iX, int iY)
+{
+    _sectorPosition.first = iX;
+    _sectorPosition.second = iY;
+}
+
+std::pair<int, int> WWPlayer::GetSectorPosition()
+{
+    return _sectorPosition;
+}
+
+int WWPlayer::GetSectorX()
+{
+    return _sectorPosition.first;
+}
+
+int WWPlayer::GetSectorY()
+{
+    return _sectorPosition.second;
+}

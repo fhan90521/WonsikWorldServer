@@ -3,7 +3,6 @@
 #include "MyStlContainer.h"
 #include "GridSystem.h"
 #include "WWEnum.h"
-#include "Sector.h"
 #include <atomic>
 class WWField :public Room
 {
@@ -25,14 +24,19 @@ private:
 	virtual void OnLeaveRoomSystem(SessionInfo sessionInfo) override;
 private:
 	//Sector Ã³¸®
+	struct SectorAround
+	{
+		int cnt = 0;
+		std::pair<int,int> around[9];
+	};
 	int _sectorMapHeight;
 	int _sectorMapWidth;
 	List<class WWPlayer*>** _sectorMap;
-	void GetSectorAround(class WWPlayer* wwPlayer, SECTOR_AROUND& sectorAround);
-	void GetSectorAround(int x,int y, SECTOR_AROUND& sectorAround);
-	void GetUpdateSectorAround(class WWPlayer* wwPlayer, SECTOR_AROUND& removeSector, SECTOR_AROUND& addSector);
-	void GetUpdateSectorByDir(int x, int y, SECTOR_AROUND& sectorAround, const int* dxdyIndexArray, int arrayLen);
-	void GetUpdateSectorByAllCheck(int beforeSectorX, int beforeSectorY, int afterSectorX, int afterSectorY, SECTOR_AROUND& removeSector, SECTOR_AROUND& addSector);
+	void GetSectorAround(class WWPlayer* wwPlayer, SectorAround& sectorAround);
+	void GetSectorAround(int x,int y, SectorAround& sectorAround);
+	void GetUpdateSectorAround(class WWPlayer* wwPlayer, SectorAround& removeSector, SectorAround& addSector);
+	void GetUpdateSectorByDir(int x, int y, SectorAround& sectorAround, const int* dxdyIndexArray, int arrayLen);
+	void GetUpdateSectorByAllCheck(int beforeSectorX, int beforeSectorY, int afterSectorX, int afterSectorY, SectorAround& removeSector, SectorAround& addSector);
 	bool CheckSectorUpdate(class WWPlayer* wwPlayer);
 	void GetSessionInfoInAroundSector(List<SessionInfo>& sessionInfoListInAroundSector, WWPlayer* wwPlayer, bool bIncludeSelf);
 	void UpdateSectorAround(class WWPlayer* wwPlayer);
