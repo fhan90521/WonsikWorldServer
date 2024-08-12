@@ -114,7 +114,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 			  //accept한 사람한테 다른 player 보내기
 			  auto pPlayerDirVec = pPlayer->GetDirVec();
 			  auto pPlayerLocation = pPlayer->GetLocation();
-			  _wwServer->CreateOtherCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), pPlayer->GetPlayerID(), pPlayer->_nickName, pPlayerDirVec.first, pPlayerDirVec.second, pPlayerLocation.first, pPlayerLocation.second);
+			  _wwServer->CreateOtherCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), pPlayer->GetPlayerID(), pPlayer->GetNickNameRef(), pPlayerDirVec.first, pPlayerDirVec.second, pPlayerLocation.first, pPlayerLocation.second);
 			  if (pPlayer->IsMoving()==true)
 			  {
 				  Vector<float> pPlayerDestinationsX;
@@ -123,7 +123,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 				  _wwServer->MoveOtherCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), pPlayer->GetPlayerID(), pPlayerDestinationsX, pPlayerDestinationsY);
 			  }
 			  //나머지에게 새로운 캐릭터 보내기
-			  _wwServer->CreateOtherCharacter_SC(pPlayer->GetSessionInfo(), GetRoomID(), newPlayer->GetPlayerID(), newPlayer->_nickName, DEFAULT_DIRX, DEFAULT_DIRY, newLocation.first, newLocation.second);
+			  _wwServer->CreateOtherCharacter_SC(pPlayer->GetSessionInfo(), GetRoomID(), newPlayer->GetPlayerID(), pPlayer->GetNickNameRef(), DEFAULT_DIRX, DEFAULT_DIRY, newLocation.first, newLocation.second);
 		  }
 
 	  }
@@ -412,7 +412,7 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 			}
 			auto otherDirVec = pAddPlayer->GetDirVec();
 			auto otherLocation = pAddPlayer->GetLocation();
-			_wwServer->CreateOtherCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(),pAddPlayer->GetPlayerID(), pAddPlayer->_nickName, otherDirVec.first, otherDirVec.second, otherLocation.first, otherLocation.second);
+			_wwServer->CreateOtherCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(),pAddPlayer->GetPlayerID(), pAddPlayer->GetNickNameRef(), otherDirVec.first, otherDirVec.second, otherLocation.first, otherLocation.second);
 			if (pAddPlayer->IsMoving())
 			{
 				Vector<float> otherDestinationXs;
@@ -421,7 +421,7 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 				_wwServer->MoveOtherCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(), pAddPlayer->GetPlayerID(), otherDestinationXs, otherDestinationYs);
 			}
 
-			_wwServer->CreateOtherCharacter_SC(pAddPlayer->GetSessionInfo(), GetRoomID(),wwPlayer->GetPlayerID(), wwPlayer->_nickName, myDirVec.first, myDirVec.second,myLocation.first,myLocation.second);
+			_wwServer->CreateOtherCharacter_SC(pAddPlayer->GetSessionInfo(), GetRoomID(),wwPlayer->GetPlayerID(), wwPlayer->GetNickNameRef(), myDirVec.first, myDirVec.second,myLocation.first,myLocation.second);
 			if (wwPlayer->IsMoving() == true)
 			{
 				_wwServer->MoveOtherCharacter_SC(pAddPlayer->GetSessionInfo(), GetRoomID(), wwPlayer->GetPlayerID(), myDestinationXs, myDestinationYs);

@@ -2,6 +2,18 @@
 #include "MathUtil.h"
 #include "WWEnum.h"
 #include "Log.h"
+void WWPlayer::SetNickName(const WString& nickName)
+{
+    _nickName = nickName;
+}
+const WString& WWPlayer::GetNickNameRef()
+{
+    return _nickName;
+}
+WString WWPlayer::GetNickName()
+{
+    return _nickName;
+}
 std::pair<float, float> WWPlayer::GetLocation()
 {
     return _location;

@@ -61,7 +61,7 @@ void WWLobby::EnterGame(SharedPtr<WWSession>& wwSession, WString& nickName)
 		WWPlayer* newPlayer = New<WWPlayer>();
 		wwSession->wwPlayer = newPlayer;
 		newPlayer->SetMoveSpeed(MOVE_SPEED);
-		newPlayer->_nickName=nickName;
+		newPlayer->SetNickName(nickName);
 		newPlayer->SetSessionInfo(wwSession->sessionInfo);
 		newPlayer->SetPlayerID(_newPlayerID++);
 		
@@ -87,5 +87,5 @@ void WWLobby::LeaveGame(SharedPtr<WWSession>& wwSession)
 		_wwServer->Disconnect(wwSession->sessionInfo);
 		return;
 	}
-	_namesOnPlay.erase(wwSession->wwPlayer->_nickName);
+	_namesOnPlay.erase(wwSession->wwPlayer->GetNickNameRef());
 }

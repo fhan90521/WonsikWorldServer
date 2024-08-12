@@ -5,6 +5,7 @@
 class WWPlayer
 {
 private:
+	WString _nickName;
 	LONG64 _playerID;
 	SessionInfo _sessionInfo;
 	float _moveSpeed;
@@ -12,6 +13,9 @@ private:
 	std::pair<float, float> _location;
 	List<std::pair<float, float>> _destinations;
 public:
+	void SetNickName(const WString& nickName);
+	const WString& GetNickNameRef();
+	WString GetNickName();
 	std::pair<float, float> GetLocation();
 	void SetLocation(const std::pair<float, float>& location);
 	void SetMoveSpeed(float speed);
@@ -30,9 +34,6 @@ public:
 
 	void Tick(float deltaTime);
 	void Move(float deltaTime);
-public:
-	//복사를 줄이기 위해
-	WString _nickName;
 //섹터처리
 public:
 	SECTOR_POS sector;
