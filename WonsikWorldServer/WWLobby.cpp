@@ -45,7 +45,7 @@ void WWLobby::OnLeaveRoomSystem(SessionInfo sessionInfo)
 }
 
 
-void WWLobby::EnterGame(SharedPtr<WWSession> wwSession, WString nickName)
+void WWLobby::EnterGame(SharedPtr<WWSession>& wwSession, WString& nickName)
 {
 	if (wwSession->sessionType != SessionType::GUEST)
 	{
@@ -80,7 +80,7 @@ void WWLobby::EnterGame(SharedPtr<WWSession> wwSession, WString nickName)
 	}
 }
 
-void WWLobby::LeaveGame(SharedPtr<WWSession> wwSession)
+void WWLobby::LeaveGame(SharedPtr<WWSession>& wwSession)
 {
 	if (wwSession->sessionType == SessionType::GUEST)
 	{

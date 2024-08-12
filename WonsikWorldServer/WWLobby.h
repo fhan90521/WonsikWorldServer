@@ -18,7 +18,7 @@ private:
 	LONG64 _newPlayerID = 1;
 	HashSet<WString> _namesOnPlay;
 public:
-	void EnterGame(SharedPtr<struct WWSession> wwSession,WString nickName);
-	void LeaveGame(SharedPtr<WWSession> wwSession);
+	void EnterGame(SharedPtr<struct WWSession>& wwSession,WString& nickName);
+	void LeaveGame(SharedPtr<struct WWSession>& wwSession);
 
 };

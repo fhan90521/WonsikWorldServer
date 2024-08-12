@@ -36,8 +36,9 @@ private:
 	void GetSessionInfoInAroundSector(List<SessionInfo>& sessionInfoListInAroundSector, WWPlayer* wwPlayer, bool bIncludeSelf);
 	void UpdateSectorAround(class WWPlayer* wwPlayer);
 public:
-	void SendChatMessage(SharedPtr<struct WWSession> wwSession, WString chatMessage);
-	void SetCharacterDestination(SharedPtr<struct WWSession> wwSession, float destinationX, float destinationY);
-	void ChangeField(SharedPtr<struct WWSession> wwSession, int afterRoomID);
+
+	void SendChatMessage(SharedPtr<struct WWSession>& wwSession, WString& chatMessage);
+	void SetCharacterDestination(SharedPtr<struct WWSession>& wwSession, float destinationX, float destinationY);
+	void ChangeField(SharedPtr<struct WWSession>& wwSession, int afterRoomID);
 	void InitMap(const int MapResource[10][10]);
 };

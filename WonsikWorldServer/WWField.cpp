@@ -36,7 +36,6 @@ void WWField::PrintFieldStatus()
 PlayerNum: {} ,UpdateTps: {}, SectorUpdateTps: {}
 )",GetRoomID(), _playerMap.size(), GetUpdateCnt(), _sectorUpdateCnt.load());
 	_sectorUpdateCnt = 0;
-
 }
 
 void WWField::Update(float deltaTime)
@@ -457,14 +456,14 @@ void WWField::InitMap(const int MapResource[10][10])
 	}
 }
 
-void WWField::SendChatMessage(SharedPtr<struct WWSession> wwSession, WString chatMessage)
+void WWField::SendChatMessage(SharedPtr<struct WWSession>& wwSession, WString& chatMessage)
 {
 	List<SessionInfo> sessionInfoListInAroundSector;
 	GetSessionInfoInAroundSector(sessionInfoListInAroundSector, wwSession->wwPlayer, false);
 	_wwServer->SendChatMessage_SC(sessionInfoListInAroundSector, GetRoomID(), wwSession->wwPlayer->GetPlayerID(), chatMessage);
 }
 
-void WWField::SetCharacterDestination(SharedPtr<WWSession> wwSession, float destinationX, float destinationY)
+void WWField::SetCharacterDestination(SharedPtr<WWSession>& wwSession, float destinationX, float destinationY)
 {
 	//destination 체크후에필요시 값변환
 	destinationX = max(0, destinationX);
@@ -534,7 +533,7 @@ void WWField::SetCharacterDestination(SharedPtr<WWSession> wwSession, float dest
 	}
 }
 
-void WWField::ChangeField(SharedPtr<WWSession> wwSession, int afterMapID)
+void WWField::ChangeField(SharedPtr<WWSession>& wwSession, int afterMapID)
 {
 	if (ChangeRoom(wwSession->sessionInfo, afterMapID) == false)
 	{

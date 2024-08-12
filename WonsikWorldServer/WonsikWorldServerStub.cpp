@@ -1,7 +1,6 @@
 #include "WonsikWorldServerStub.h"
 #include "IOCPServer.h"
 #include "Log.h"
-using namespace std;
 bool WonsikWorldServerStub::PacketProcEnterGame_CS(SessionInfo sessionInfo, CRecvBuffer& buf)
 {
 	WString nickName;
