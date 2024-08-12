@@ -12,6 +12,7 @@ public:
 	virtual ~WWField();
 	std::atomic<int> _sectorUpdateCnt = 0;
 	void PrintFieldStatus();
+	void InitMap(const int MapResource[10][10]);
 private:
 	HashMap<SessionInfo::ID, class WWPlayer*> _playerMap;
 	GridSystem _gridSystem;
@@ -36,9 +37,8 @@ private:
 	void GetSessionInfoInAroundSector(List<SessionInfo>& sessionInfoListInAroundSector, WWPlayer* wwPlayer, bool bIncludeSelf);
 	void UpdateSectorAround(class WWPlayer* wwPlayer);
 public:
-
+	//Job
 	void SendChatMessage(SharedPtr<struct WWSession>& wwSession, WString& chatMessage);
 	void SetCharacterDestination(SharedPtr<struct WWSession>& wwSession, float destinationX, float destinationY);
 	void ChangeField(SharedPtr<struct WWSession>& wwSession, int afterRoomID);
-	void InitMap(const int MapResource[10][10]);
 };
