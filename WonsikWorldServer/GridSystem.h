@@ -7,10 +7,10 @@ private:
 
 	struct Node
 	{
-        int x;
-        int y;
-        double moveLen;
-        double destLen;
+        int x=0;
+        int y=0;
+        double moveLen=0;
+        double destLen=0;
         Node* pParent = nullptr;
         int id;
         bool  obstacle = false;

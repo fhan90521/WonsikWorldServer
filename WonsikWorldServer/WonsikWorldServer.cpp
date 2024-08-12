@@ -10,8 +10,9 @@
 #include "WWRoomSystem.h"
 #include <iostream>
 #include <format>
-WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("WWServerSet.Json"),_wwRoomSystem(new WWRoomSystem(this))
+WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("WWServerSet.Json")
 {
+	_wwRoomSystem = new WWRoomSystem(this);
 	_lobby = MakeShared<WWLobby>(this);
 	_fields[ROOM_ID_FIELD1] = MakeShared<WWField>(this);
 	_fields[ROOM_ID_FIELD2] = MakeShared<WWField>(this);
@@ -37,12 +38,12 @@ WonsikWorldServer::~WonsikWorldServer()
 		delete _checkRecvTimeThread;
 		CloseHandle(_hShutDownEvent);
 	}
-
-
-	CloseServer();
 	_wwRoomSystem->DeregisterRoom(ROOM_ID_LOBBY);
 	_wwRoomSystem->DeregisterRoom(ROOM_ID_FIELD1);
 	_wwRoomSystem->DeregisterRoom(ROOM_ID_FIELD2);
+	delete _wwRoomSystem;
+
+	CloseServer();
 }
 
 void WonsikWorldServer::Run()
