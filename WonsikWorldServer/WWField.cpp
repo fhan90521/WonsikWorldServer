@@ -8,6 +8,7 @@
 #include "MathUtil.h"
 #include "MapSource.h"
 #include <cmath>
+#include <format>
 WWField::WWField(WonsikWorldServer* pServer):Room(pServer->GetCompletionPortHandle()),_gridSystem(MAP_HEIGHT/GRID_CELL_SIZE,MAP_WIDTH / GRID_CELL_SIZE, GRID_CELL_SIZE )
 {
     _wwServer = pServer;

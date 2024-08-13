@@ -1,6 +1,5 @@
 #include "WonsikWorldServer.h"
 #include "Log.h"
-#include "WWEnum.h"
 #include "MakeShared.h"
 #include "WWLobby.h"
 #include "WWSession.h"
@@ -16,9 +15,24 @@ WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("
 	_lobby = MakeShared<WWLobby>(this);
 	_fields[ROOM_ID_FIELD1] = MakeShared<WWField>(this);
 	_fields[ROOM_ID_FIELD2] = MakeShared<WWField>(this);
-	_wwRoomSystem->RegisterRoom(_lobby);
-	_wwRoomSystem->RegisterRoom(_fields[ROOM_ID_FIELD1]);
-	_wwRoomSystem->RegisterRoom(_fields[ROOM_ID_FIELD2]);
+	
+	int lobbyRoomID = _wwRoomSystem->RegisterRoom(_lobby);
+	if (lobbyRoomID != ROOM_ID_LOBBY)
+	{
+		Log::LogOnFile(Log::SYSTEM_LEVEL, "Lobby Room ID not match");
+		DebugBreak();
+	}
+	
+	for (int i = 1; i < _fields.size(); i++)
+	{
+		int fieldRoomID = _wwRoomSystem->RegisterRoom(_fields[i]);
+		if (fieldRoomID != _roomIDs[i])
+		{
+			Log::LogOnFile(Log::SYSTEM_LEVEL, "FIELD%d Room ID not match",i);
+			DebugBreak();
+		}
+	}
+
 	_fields[ROOM_ID_FIELD1]->InitMap(map1);
 	_fields[ROOM_ID_FIELD2]->InitMap(map2);
 
@@ -27,6 +41,8 @@ WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("
 		_hShutDownEvent = CreateEvent(NULL, TRUE, false, NULL);
 		_checkRecvTimeThread = new std::thread(&WonsikWorldServer::CheckLastRecvTime, this);
 	}
+	
+	//_monitor.AddInterface("0.0.0.0");
 }
 
 WonsikWorldServer::~WonsikWorldServer()

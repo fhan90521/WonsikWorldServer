@@ -5,10 +5,8 @@
 #include "MyStlContainer.h"
 #include "LockGuard.h"
 #include "RoomSystem.h"
+#include "WWEnum.h"
 #include <thread>
-#include <chrono>
-#include <condition_variable>
-#include <mutex>
 #include "PerformanceMonitor.h"
 class WonsikWorldServer : public IOCPServer,public WonsikWorldServerProxy, public WonsikWorldServerStub
 {
@@ -41,6 +39,7 @@ private:
 	class WWRoomSystem* _wwRoomSystem;
 	SharedPtr<class WWLobby> _lobby;
 	Array<SharedPtr<class WWField>,3> _fields;
+	Array<int, 3> _roomIDs = { ROOM_ID_LOBBY,ROOM_ID_FIELD1,ROOM_ID_FIELD2 };
 	USE_LOCK;
 	HashMap<SessionInfo::ID, SharedPtr<struct WWSession>> _wwSessions;
 private:
