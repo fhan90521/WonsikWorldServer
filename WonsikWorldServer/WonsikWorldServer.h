@@ -8,7 +8,7 @@
 #include "WWEnum.h"
 #include <thread>
 #include "PerformanceMonitor.h"
-class WonsikWorldServer : public IOCPServer,public WonsikWorldServerProxy, public WonsikWorldServerStub
+class WonsikWorldServer : public IOCPServer,public WonsikWorldServerProxy,private WonsikWorldServerStub
 {
 private:
 	PerformanceMonitor _monitor;
