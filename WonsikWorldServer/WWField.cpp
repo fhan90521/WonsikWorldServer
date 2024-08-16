@@ -126,7 +126,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 				  _wwServer->MoveOtherCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), pPlayer->GetPlayerID(), pPlayerDestinations);
 			  }
 			  //나머지에게 새로운 캐릭터 보내기
-			  _wwServer->CreateOtherCharacter_SC(pPlayer->GetSessionInfo(), GetRoomID(), newPlayer->GetPlayerID(), pPlayer->GetNickNameRef(), defaultDirVec, newLocation);
+			  _wwServer->CreateOtherCharacter_SC(pPlayer->GetSessionInfo(), GetRoomID(), newPlayer->GetPlayerID(), newPlayer->GetNickNameRef(), defaultDirVec, newLocation);
 		  }
 
 	  }
