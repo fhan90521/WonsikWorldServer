@@ -1,7 +1,7 @@
 #include "WWPlayer.h"
-#include "MathUtil.h"
 #include "WWEnum.h"
 #include "Log.h"
+#include "GridSystem.h"
 void WWPlayer::SetNickName(const WString& nickName)
 {
     _nickName = nickName;
@@ -14,12 +14,12 @@ WString WWPlayer::GetNickName()
 {
     return _nickName;
 }
-std::pair<float, float> WWPlayer::GetLocation()
+WWVector2D WWPlayer::GetLocation()
 {
     return _location;
 }
 
-void WWPlayer::SetLocation(const std::pair<float, float>& location)
+void WWPlayer::SetLocation(const WWVector2D& location)
 {
     _location = location;
 }
@@ -29,32 +29,18 @@ void WWPlayer::SetMoveSpeed(float speed)
     _moveSpeed = speed;
 }
 
-void WWPlayer::SetDestinations(const List<std::pair<float, float>>& destinations, bool bIgnoreFirst)
+void WWPlayer::SetDestinations(const List<WWVector2D>& destinations)
 {
-    if (destinations.empty())
-    {
-        return;
-    }
-
-    //목적지 세팅
-    if (bIgnoreFirst)
-    {
-        //pathPoint[0] 첫번째가 현재위치라서 무시하는경우
-        _destinations.clear();
-        auto iterInput = destinations.begin();
-        iterInput++;
-        for (; iterInput != destinations.end(); iterInput++)
-        {
-            _destinations.push_back(*iterInput);
-        }
-    }
-    else
-    {
-        _destinations = destinations;
-    }
+    _destinations = destinations;
 }
 
-bool WWPlayer::GetDestination(std::pair<float, float>& destination)
+void WWPlayer::SetDestinations(const Vector<WWVector2D>& destinations)
+{
+    _destinations.clear();
+    _destinations.insert(_destinations.end(), destinations.begin(), destinations.end());
+}
+
+bool WWPlayer::GetDestination(WWVector2D& destination)
 {
     if (_destinations.empty())
     {
@@ -64,19 +50,14 @@ bool WWPlayer::GetDestination(std::pair<float, float>& destination)
     return true;
 }
 
-bool WWPlayer::GetDestinations(Vector<float>& destinationXs, Vector<float>& destinationYs)
+bool WWPlayer::GetDestinations(Vector<WWVector2D>& destinations)
 {
     if (_destinations.empty())
     {
         return false;
     }
-    destinationXs.push_back(_location.first);
-    destinationYs.push_back(_location.second);
-    for (auto& destination : _destinations)
-    {
-        destinationXs.push_back(destination.first);
-        destinationYs.push_back(destination.second);
-    }
+    destinations.push_back(_location);
+    destinations.insert(destinations.end(), _destinations.begin(), _destinations.end());
     return true;
 }
 
@@ -110,18 +91,18 @@ LONG64 WWPlayer::GetPlayerID()
     return _playerID;
 }
 
-void WWPlayer::SetDirVec(const std::pair<float, float>& dirVec)
+void WWPlayer::SetDirVec(const WWVector2D& dirVec)
 {
     _dirVec = dirVec;
 }
 
 void WWPlayer::SetDirVec(float x, float y)
 {
-    _dirVec.first = x;
-    _dirVec.second = y;
+    _dirVec._x = x;
+    _dirVec._y = y;
 }
 
-std::pair<float, float> WWPlayer::GetDirVec()
+WWVector2D WWPlayer::GetDirVec()
 {
     return _dirVec;
 }
@@ -136,32 +117,29 @@ void WWPlayer::Move(float deltaTime)
 {
     if (_destinations.size()>0)
     { 
-        std::pair<float, float>& destination = _destinations.front();
-        //일단 dirVec로 이동
-        std::pair<float, float> newDirVec; 
-        newDirVec.first = destination.first - _location.first;
-        newDirVec.second = destination.second - _location.second;
-        Normalize(newDirVec);
-        _dirVec = newDirVec;
-    
-        _location.first += _dirVec.first * _moveSpeed * deltaTime;
-        _location.second += _dirVec.second * _moveSpeed * deltaTime;
-   
-        _location.first = max(0, _location.first);
-        _location.first = min(MAP_WIDTH - 1, _location.first);
-        _location.second = max(0, _location.second);
-        _location.second = min(MAP_HEIGHT - 1, _location.second);
 
-        //Log::LogOnConsole(Log::DEBUG_LEVEL, "locationX : %f locationY : %f, dirVecX: %f, dirVecY: %f, deltaTime: %f\n", _location.first, _location.second,_dirVec.first,_dirVec.second, deltaTime);
-      
-   
-        float distance = GetDistanceBetweenTwoPoint(destination.first, destination.second, _location.first, _location.second);
+        WWVector2D& destination = _destinations.front();
+        WWVector2D dirVec = destination - _location;
+        float distance = dirVec.Length();
         //도착했는지 확인
-        if (IsSameGrid(destination.first, destination.second, _location.first, _location.second, GRID_CELL_SIZE) == true && distance < CLOSE_DISTANCE)
+        if (GridSystem::IsSameGrid(destination._x, destination._y, _location._x, _location._y) == true && distance < CLOSE_DISTANCE )
         {
             _destinations.pop_front();
         }
 
+        if (_destinations.size() > 0)
+        {
+            destination = _destinations.front();
+            dirVec = destination - _location;
+            dirVec.Normalize();
+            _dirVec = dirVec;
+            _location._x += _dirVec._x * _moveSpeed * deltaTime;
+            _location._y += _dirVec._y * _moveSpeed * deltaTime;
+            _location._x = max(0, _location._x);
+            _location._x = min(MAP_WIDTH - 1, _location._x);
+            _location._y = max(0, _location._y);
+            _location._y = min(MAP_HEIGHT - 1, _location._y);
+        }
     }
 }
 

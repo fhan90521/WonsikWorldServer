@@ -3,6 +3,7 @@
 #include "MyStlContainer.h"
 #include "GridSystem.h"
 #include "WWEnum.h"
+#include "WWVector2D.h"
 #include <atomic>
 class WWField :public Room
 {
@@ -27,7 +28,7 @@ private:
 	struct SectorAround
 	{
 		int cnt = 0;
-		std::pair<int,int> around[9];
+		std::pair<int, int> around[9];
 	};
 	int _sectorMapHeight;
 	int _sectorMapWidth;
@@ -43,6 +44,6 @@ private:
 public:
 	//Job
 	void SendChatMessage(SharedPtr<struct WWSession>& wwSession, WString& chatMessage);
-	void SetCharacterDestination(SharedPtr<struct WWSession>& wwSession, float destinationX, float destinationY);
+	void SetCharacterDestination(SharedPtr<struct WWSession>& wwSession, WWVector2D destination);
 	void ChangeField(SharedPtr<struct WWSession>& wwSession, int afterRoomID);
 };

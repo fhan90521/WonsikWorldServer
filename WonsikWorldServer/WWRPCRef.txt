@@ -1,5 +1,7 @@
 RPC 1
 {
+	RegisterClass : WWVector2D
+
 	//------------------------------------------------------------
 	//  게임입장
 	//
@@ -30,8 +32,8 @@ RPC 1
 	//------------------------------------------------------------
 	EnterGame_SC(short enterGameResult, LONG64 playerID)	
 
-	CreateMyCharacter_SC(short mapID, float dirX, float dirY, float locationX, float locationY)
-	CreateOtherCharacter_SC(short mapID, LONG64 playerID, WString nickName, float dirX, float dirY, float locationX, float locationY)
+	CreateMyCharacter_SC(short mapID, WWVector2D dirVec, WWVector2D location)
+	CreateOtherCharacter_SC(short mapID, LONG64 playerID, WString nickName, WWVector2D dirVec, WWVector2D location)
 	DeleteCharacter_SC(short mapID, LONG64 playerID)
 
 	//------------------------------------------------------------
@@ -86,25 +88,23 @@ RPC 1
 	//
 	//	{
 	//		WORD	type
-	//		short	mapID;							
-	//		float	destinationX;
-	//		float	destinationY;
+	//		short	mapID;
+	//		WWVector2D destination							
 	//	}
 	//	destincations[0] == 출발장소
 	//------------------------------------------------------------
-	MoveMyCharacter_CS(short mapID, float destinationX, float destinationY)
+	MoveMyCharacter_CS(short mapID, WWVector2D destination)
 
 	//------------------------------------------------------------
 	//	MoveMyCharacter_SC
 	//	{
 	//		WORD	type
 	//		short	mapID;
-	//		Vector<float>	destinationsX;					
-	//		Vector<float>	destinationsY;
+	//		Vector<WWVector2D> destinations;					
 	//	}
 	//	destincations[0] == 출발장소
 	//------------------------------------------------------------
-	MoveMyCharacter_SC(short mapID, Vector<float> destinationsX, Vector<float> destinationsY)	
+	MoveMyCharacter_SC(short mapID, Vector<WWVector2D> destinations)	
 
 	//------------------------------------------------------------
 	//	MoveOtherCharacter_SC
@@ -112,12 +112,11 @@ RPC 1
 	//		WORD	type
 	//		short	mapID;
 	//		LONG64		playerID;
-	//		Vector<float>	destinationsX;					
-	//		Vector<float>	destinationsY;
+	// 		Vector<WWVector2D> destinations;	
 	//	}
 	//	destincations[0] == 출발장소
 	//------------------------------------------------------------
-	MoveOtherCharacter_SC(short mapID, LONG64 playerID, Vector<float> destinationsX, Vector<float> destinationsY)	
+	MoveOtherCharacter_SC(short mapID, LONG64 playerID, Vector<WWVector2D> destinations)	
 
 
 	//------------------------------------------------------------

@@ -5,10 +5,10 @@
 #include "WWPlayer.h"
 #include "dXdY.h"
 #include "Room.h"
-#include "MathUtil.h"
 #include "MapSource.h"
 #include <cmath>
 #include <format>
+#include "WWVector2D.h"
 WWField::WWField(WonsikWorldServer* pServer):Room(pServer->GetCompletionPortHandle()),_gridSystem(MAP_HEIGHT/GRID_CELL_SIZE,MAP_WIDTH / GRID_CELL_SIZE, GRID_CELL_SIZE )
 {
     _wwServer = pServer;
@@ -67,13 +67,13 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  WWPlayer* newPlayer = wwSession->wwPlayer;
 
 	  //랜덤 스폰 장소찾기
-	  std::pair<float, float> newLocation;
+	  WWVector2D newLocation;
 	  bool bFindNoneObstacle = false;
 	  for (int i = 0; i < 10; i++)
 	  {
-		  newLocation.first = (rand() % (MAP_WIDTH));
-		  newLocation.second = (rand() % (MAP_HEIGHT));
-		  if (_gridSystem.IsObstacleByFloat(newLocation) == false)
+		  newLocation._x = (rand() % (MAP_WIDTH));
+		  newLocation._y = (rand() % (MAP_HEIGHT));
+		  if (_gridSystem.IsObstacleByFloat(newLocation._x,newLocation._y) == false)
 		  {
 			  bFindNoneObstacle = true;
 			  break;
@@ -81,7 +81,10 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  }
 	  if (bFindNoneObstacle == false)
 	  {
-		  _gridSystem.GetNotObstacleLocation(newLocation);
+		  auto pairLocation = newLocation.TransferToPair();
+		  _gridSystem.GetNotObstacleLocation(pairLocation);
+		  newLocation._x = pairLocation.first;
+		  newLocation._y = pairLocation.second;
 	  }
 		
 	  //Debug용
@@ -89,14 +92,15 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  //newLocation.second = 50;
 
 	  //player Init
+	  WWVector2D defaultDirVec(DEFAULT_DIRX, DEFAULT_DIRY);
 	  newPlayer->SetLocation(newLocation);
-	  newPlayer->SetDirVec(DEFAULT_DIRX,DEFAULT_DIRY);
-	  newPlayer->SetSectorPosition(newLocation.first / SECTOR_SIZE + 1, newLocation.second / SECTOR_SIZE + 1);
+	  newPlayer->SetDirVec(defaultDirVec);
+	  newPlayer->SetSectorPosition(newLocation._x / SECTOR_SIZE + 1, newLocation._y / SECTOR_SIZE + 1);
 	  newPlayer->Stop();
 
 	  //Log::LogOnConsole(Log::ERROR_LEVEL, "newPlayer ID:%d, roomID %d", newPlayer->GetPlayerID(), GetRoomID());
 	  //당사자와 주위 섹터 플레이어들 업데이트
-	  _wwServer->CreateMyCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), DEFAULT_DIRX, DEFAULT_DIRY, newLocation.first, newLocation.second);
+	  _wwServer->CreateMyCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), defaultDirVec, newLocation);
 
 	  SectorAround sectorAround;
 	  GetSectorAround(newPlayer, sectorAround);
@@ -114,16 +118,15 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 			  //accept한 사람한테 다른 player 보내기
 			  auto pPlayerDirVec = pPlayer->GetDirVec();
 			  auto pPlayerLocation = pPlayer->GetLocation();
-			  _wwServer->CreateOtherCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), pPlayer->GetPlayerID(), pPlayer->GetNickNameRef(), pPlayerDirVec.first, pPlayerDirVec.second, pPlayerLocation.first, pPlayerLocation.second);
+			  _wwServer->CreateOtherCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), pPlayer->GetPlayerID(), pPlayer->GetNickNameRef(), pPlayerDirVec, pPlayerLocation);
 			  if (pPlayer->IsMoving()==true)
 			  {
-				  Vector<float> pPlayerDestinationsX;
-				  Vector<float> pPlayerDestinationsY;
-				  pPlayer->GetDestinations(pPlayerDestinationsX, pPlayerDestinationsY);
-				  _wwServer->MoveOtherCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), pPlayer->GetPlayerID(), pPlayerDestinationsX, pPlayerDestinationsY);
+				  Vector<WWVector2D> pPlayerDestinations;
+				  pPlayer->GetDestinations(pPlayerDestinations);
+				  _wwServer->MoveOtherCharacter_SC(newPlayer->GetSessionInfo(), GetRoomID(), pPlayer->GetPlayerID(), pPlayerDestinations);
 			  }
 			  //나머지에게 새로운 캐릭터 보내기
-			  _wwServer->CreateOtherCharacter_SC(pPlayer->GetSessionInfo(), GetRoomID(), newPlayer->GetPlayerID(), pPlayer->GetNickNameRef(), DEFAULT_DIRX, DEFAULT_DIRY, newLocation.first, newLocation.second);
+			  _wwServer->CreateOtherCharacter_SC(pPlayer->GetSessionInfo(), GetRoomID(), newPlayer->GetPlayerID(), pPlayer->GetNickNameRef(), defaultDirVec, newLocation);
 		  }
 
 	  }
@@ -208,8 +211,8 @@ void WWField::GetSectorAround(int x, int y, SectorAround& sectorAround)
 void WWField::GetUpdateSectorAround(WWPlayer* wwPlayer, SectorAround& removeSector, SectorAround& addSector)
 {
 	auto location = wwPlayer->GetLocation();
-	int currentSectorX = location.first/ SECTOR_SIZE + 1;
-	int currentSectorY = location.second / SECTOR_SIZE + 1;
+	int currentSectorX = location._x/ SECTOR_SIZE + 1;
+	int currentSectorY = location._y / SECTOR_SIZE + 1;
 	int prevSectorX = wwPlayer->GetSectorX();
 	int prevSectorY = wwPlayer->GetSectorY();
 	int dX = currentSectorX - prevSectorX;
@@ -296,15 +299,14 @@ void WWField::GetUpdateSectorByDir(int x, int y, SectorAround& sectorAround, con
 
 void WWField::GetUpdateSectorByAllCheck(int beforeSectorX, int beforeSectorY, int afterSectorX, int afterSectorY, SectorAround& removeSector, SectorAround& addSector)
 {
-	using std::pair;
-	Vector<pair<int,int>> beforeAroundSectors;
-	Vector<pair<int,int>> afterAroundSectors;
+	Vector<std::pair<int,int>> beforeAroundSectors;
+	Vector<std::pair<int, int>> afterAroundSectors;
 	for (int iY = -1; iY <= 1; iY++)
 	{
 		for (int iX = -1; iX <= 1; iX++)
 		{
-			beforeAroundSectors.push_back(pair<int, int>(beforeSectorX + iX, beforeSectorY + iY));
-			afterAroundSectors.push_back(pair<int, int>(afterSectorX + iX, afterSectorY + iY));
+			beforeAroundSectors.push_back(std::pair<int, int>(beforeSectorX + iX, beforeSectorY + iY));
+			afterAroundSectors.push_back(std::pair<int, int>(afterSectorX + iX, afterSectorY + iY));
 		}
 	}
 
@@ -312,8 +314,8 @@ void WWField::GetUpdateSectorByAllCheck(int beforeSectorX, int beforeSectorY, in
 	{
 		bool IsBeforeComparingSectorRemoveSector = true;
 		bool IsAfterComparingSectorAddSector = true;
-		pair<int, int> beforeComparingSector = beforeAroundSectors[comparingIndex];
-		pair<int, int> afterComparingSector = afterAroundSectors[comparingIndex];
+		std::pair<int, int> beforeComparingSector = beforeAroundSectors[comparingIndex];
+		std::pair<int, int> afterComparingSector = afterAroundSectors[comparingIndex];
 		for (int i = 0; i < beforeAroundSectors.size(); i++)
 		{
 			if (beforeComparingSector.first == afterAroundSectors[i].first && beforeComparingSector.second == afterAroundSectors[i].second)
@@ -369,8 +371,8 @@ void WWField::GetSessionInfoInAroundSector(List<SessionInfo>& sessionInfoListInA
 bool WWField::CheckSectorUpdate(WWPlayer* wwPlayer)
 {
 	auto location = wwPlayer->GetLocation();
-	int currentSectorX = location.first / SECTOR_SIZE + 1;
-	int currentSectorY = location.second / SECTOR_SIZE + 1;
+	int currentSectorX = location._x / SECTOR_SIZE + 1;
+	int currentSectorY = location._y / SECTOR_SIZE + 1;
 	if (currentSectorX != wwPlayer->GetSectorX() || currentSectorY != wwPlayer->GetSectorY())
 	{
 		return true;
@@ -388,7 +390,7 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 	{
 		for (WWPlayer* pRemovePlayer : _sectorMap[removeSector.around[i].second][removeSector.around[i].first])
 		{
-			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayerId :%d, wwPlayerX: %f wwPlayerY: %f, removePlayerID: %d, removeX : %f removeY: %f\n", wwPlayer->GetPlayerID(), wwPlayer->GetLocation().first, wwPlayer->GetLocation().second, pRemovePlayer->GetPlayerID(), pRemovePlayer->GetLocation().first, pRemovePlayer->GetLocation().second);
+			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayerId :%d, wwPlayerX: %f wwPlayerY: %f, removePlayerID: %d, removeX : %f removeY: %f\n", wwPlayer->GetPlayerID(), wwPlayer->GetLocation()._x, wwPlayer->GetLocation()._y, pRemovePlayer->GetPlayerID(), pRemovePlayer->GetLocation()._x, pRemovePlayer->GetLocation()._y);
 			if (pRemovePlayer->GetPlayerID() != wwPlayer->GetPlayerID())
 			{
 				_wwServer->DeleteCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(), pRemovePlayer->GetPlayerID());
@@ -397,13 +399,12 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 		}
 	}
 
-	auto myDirVec = wwPlayer->GetDirVec();
-	auto myLocation = wwPlayer->GetLocation();
-	Vector<float> myDestinationXs;
-	Vector<float> myDestinationYs;
+	WWVector2D myDirVec = wwPlayer->GetDirVec();
+	WWVector2D myLocation = wwPlayer->GetLocation();
+	Vector<WWVector2D> myDestinations;
 	if (wwPlayer->IsMoving()==true)
 	{
-		wwPlayer->GetDestinations(myDestinationXs, myDestinationYs);
+		wwPlayer->GetDestinations(myDestinations);
 	}
 	
 	for (int i = 0; i < addSector.cnt; i++)
@@ -414,24 +415,23 @@ void WWField::UpdateSectorAround(WWPlayer* wwPlayer)
 			{
 				continue;
 			}
-			auto otherDirVec = pAddPlayer->GetDirVec();
-			auto otherLocation = pAddPlayer->GetLocation();
-			_wwServer->CreateOtherCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(),pAddPlayer->GetPlayerID(), pAddPlayer->GetNickNameRef(), otherDirVec.first, otherDirVec.second, otherLocation.first, otherLocation.second);
+			WWVector2D otherDirVec = pAddPlayer->GetDirVec();
+			WWVector2D otherLocation = pAddPlayer->GetLocation();
+			_wwServer->CreateOtherCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(),pAddPlayer->GetPlayerID(), pAddPlayer->GetNickNameRef(), otherDirVec, otherLocation);
 			if (pAddPlayer->IsMoving())
 			{
-				Vector<float> otherDestinationXs;
-				Vector<float> otherDestinationYs;
-				pAddPlayer->GetDestinations(otherDestinationXs, otherDestinationYs);
-				_wwServer->MoveOtherCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(), pAddPlayer->GetPlayerID(), otherDestinationXs, otherDestinationYs);
+				Vector<WWVector2D> otherDestinations;
+				pAddPlayer->GetDestinations(otherDestinations);
+				_wwServer->MoveOtherCharacter_SC(wwPlayer->GetSessionInfo(), GetRoomID(), pAddPlayer->GetPlayerID(), otherDestinations);
 			}
 
-			_wwServer->CreateOtherCharacter_SC(pAddPlayer->GetSessionInfo(), GetRoomID(),wwPlayer->GetPlayerID(), wwPlayer->GetNickNameRef(), myDirVec.first, myDirVec.second,myLocation.first,myLocation.second);
+			_wwServer->CreateOtherCharacter_SC(pAddPlayer->GetSessionInfo(), GetRoomID(),wwPlayer->GetPlayerID(), wwPlayer->GetNickNameRef(), myDirVec,myLocation);
 			if (wwPlayer->IsMoving() == true)
 			{
-				_wwServer->MoveOtherCharacter_SC(pAddPlayer->GetSessionInfo(), GetRoomID(), wwPlayer->GetPlayerID(), myDestinationXs, myDestinationYs);
+				_wwServer->MoveOtherCharacter_SC(pAddPlayer->GetSessionInfo(), GetRoomID(), wwPlayer->GetPlayerID(), myDestinations);
 			}
 
-			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayerId :%d, wwPlayerX: %f wwPlayerY: %f, addPlayerID: %d, pAddPlayer : %f pAddPlayer: %f\n", wwPlayer->GetPlayerID(), wwPlayer->GetLocation().first, wwPlayer->GetLocation().second, pAddPlayer->GetPlayerID(), pAddPlayer->GetLocation().first, pAddPlayer->GetLocation().second);
+			Log::LogOnConsole(Log::DEBUG_LEVEL, "wwPlayerId :%d, wwPlayerX: %f wwPlayerY: %f, addPlayerID: %d, pAddPlayer : %f pAddPlayer: %f\n", wwPlayer->GetPlayerID(), wwPlayer->GetLocation()._x, wwPlayer->GetLocation()._y, pAddPlayer->GetPlayerID(), pAddPlayer->GetLocation()._x, pAddPlayer->GetLocation()._y);
 
 		}
 	}
@@ -467,47 +467,45 @@ void WWField::SendChatMessage(SharedPtr<struct WWSession>& wwSession, WString& c
 	_wwServer->SendChatMessage_SC(sessionInfoListInAroundSector, GetRoomID(), wwSession->wwPlayer->GetPlayerID(), chatMessage);
 }
 
-void WWField::SetCharacterDestination(SharedPtr<WWSession>& wwSession, float destinationX, float destinationY)
+void WWField::SetCharacterDestination(SharedPtr<WWSession>& wwSession, WWVector2D destination)
 {
-	//destination 체크후에필요시 값변환
-	destinationX = max(0, destinationX);
-	destinationX = min(MAP_WIDTH - 1, destinationX);
-	destinationY = max(0, destinationY);
-	destinationY = min(MAP_HEIGHT - 1, destinationY);
-	
-	
-
 	//비정상 거리인지 체크
-	std::pair<float, float> playerLocation = wwSession->wwPlayer->GetLocation();
+	WWVector2D playerLocation = wwSession->wwPlayer->GetLocation();
 	//Log::LogOnConsole(Log::DEBUG_LEVEL, "serverlocationX: %f serverLocationY: %f destinationX : %f destinationY: %f\n", playerLocation.first, playerLocation.second, destinationX, destinationY);
-	
-	float distanceToDest = GetDistanceBetweenTwoPoint(playerLocation.first, playerLocation.second, destinationX, destinationY);
+
+	WWVector2D difVec = destination - playerLocation;
+	float distanceToDest = difVec.Length();
 	if (distanceToDest > STRANGE_DISTANCE_TO_DEST)
 	{
 		_wwServer->Disconnect(wwSession->sessionInfo);
 		return;
 	}
+	
+	//destination 체크후에필요시 값변환
+	destination._x = max(0, destination._x);
+	destination._x = min(MAP_WIDTH - 1, destination._x);
+	destination._y = max(0, destination._y);
+	destination._y = min(MAP_HEIGHT - 1, destination._y);
+	
 
 	//길찾기
-	List<std::pair<float, float>> pathPoints;
-	Vector<float> destinationXs;
-	Vector<float> destinationYs;
+	List<std::pair<float,float>> pathPoints;
+	Vector<WWVector2D> destinations;
 
-	if (_gridSystem.FindPath(playerLocation.first, playerLocation.second, destinationX, destinationY, pathPoints) == true)
+	if (_gridSystem.FindPath(playerLocation._x, playerLocation._y, destination._x, destination._y, pathPoints) == true)
 	{
-		//플레이어의 목적지 세팅 pathPoints[0] 은 출발 지점이었으므로 앞에 하나를 무시해서 플레이어의 목적지 세팅
-		wwSession->wwPlayer->SetDestinations(pathPoints,true);
 		
 		//패킷전송
-		for (auto& pathPoint : pathPoints)
+		for (auto pathPoint : pathPoints)
 		{
-			destinationXs.push_back(pathPoint.first);
-			destinationYs.push_back(pathPoint.second);
+			destinations.push_back(WWVector2D(pathPoint.first,pathPoint.second));
 		}
+		wwSession->wwPlayer->SetDestinations(destinations);
+		
 		List<SessionInfo> sessionInfoListInAroundSector;
 		GetSessionInfoInAroundSector(sessionInfoListInAroundSector, wwSession->wwPlayer, false);
-		_wwServer->MoveMyCharacter_SC(wwSession->sessionInfo, GetRoomID(), destinationXs, destinationYs);
-		_wwServer->MoveOtherCharacter_SC(sessionInfoListInAroundSector, GetRoomID(), wwSession->wwPlayer->GetPlayerID(), destinationXs, destinationYs);
+		_wwServer->MoveMyCharacter_SC(wwSession->sessionInfo, GetRoomID(), destinations);
+		_wwServer->MoveOtherCharacter_SC(sessionInfoListInAroundSector, GetRoomID(), wwSession->wwPlayer->GetPlayerID(), destinations);
 
 	}
 	else

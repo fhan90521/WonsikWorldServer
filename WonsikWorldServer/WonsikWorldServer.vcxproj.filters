@@ -42,13 +42,13 @@
     <ClCompile Include="WWSession.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="MathUtil.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="WonsikWorldServerStub.cpp">
       <Filter>RPC</Filter>
     </ClCompile>
     <ClCompile Include="WWRoomSystem.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="WWVector2D.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,9 +80,6 @@
     <ClInclude Include="GridSystem.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="MathUtil.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="dXdY.h">
       <Filter>리소스 파일</Filter>
     </ClInclude>
@@ -93,6 +90,9 @@
       <Filter>RPC</Filter>
     </ClInclude>
     <ClInclude Include="WWRoomSystem.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="WWVector2D.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

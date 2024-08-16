@@ -1,5 +1,6 @@
 #include "WonsikWorldServerProxy.h"
 #include "WonsikWorldPKT_TYPE.h"
+#include "WWVector2D.h"
 void WonsikWorldServerProxy::EnterGame_CS(SessionInfo sessionInfo, const WString& nickName, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
@@ -62,13 +63,13 @@ void WonsikWorldServerProxy::EnterGame_SC(const List<SessionInfo>& sessionInfoLi
 	}
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::CreateMyCharacter_SC(SessionInfo sessionInfo, short mapID, float dirX, float dirY, float locationX, float locationY, bool bDisconnect)
+void WonsikWorldServerProxy::CreateMyCharacter_SC(SessionInfo sessionInfo, short mapID, const WWVector2D& dirVec, const WWVector2D& location, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_CreateMyCharacter_SC << mapID << dirX << dirY << locationX << locationY;
+		*pBuf << PKT_TYPE_CreateMyCharacter_SC << mapID << dirVec << location;
 	}
 	catch(int useSize)
 	{
@@ -76,13 +77,13 @@ void WonsikWorldServerProxy::CreateMyCharacter_SC(SessionInfo sessionInfo, short
 	_pServer->Unicast(sessionInfo, pBuf, bDisconnect);
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::CreateMyCharacter_SC(const List<SessionInfo>& sessionInfoList, short mapID, float dirX, float dirY, float locationX, float locationY, bool bDisconnect)
+void WonsikWorldServerProxy::CreateMyCharacter_SC(const List<SessionInfo>& sessionInfoList, short mapID, const WWVector2D& dirVec, const WWVector2D& location, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_CreateMyCharacter_SC << mapID << dirX << dirY << locationX << locationY;
+		*pBuf << PKT_TYPE_CreateMyCharacter_SC << mapID << dirVec << location;
 	}
 	catch(int useSize)
 	{
@@ -93,13 +94,13 @@ void WonsikWorldServerProxy::CreateMyCharacter_SC(const List<SessionInfo>& sessi
 	}
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::CreateOtherCharacter_SC(SessionInfo sessionInfo, short mapID, LONG64 playerID, const WString& nickName, float dirX, float dirY, float locationX, float locationY, bool bDisconnect)
+void WonsikWorldServerProxy::CreateOtherCharacter_SC(SessionInfo sessionInfo, short mapID, LONG64 playerID, const WString& nickName, const WWVector2D& dirVec, const WWVector2D& location, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_CreateOtherCharacter_SC << mapID << playerID << nickName << dirX << dirY << locationX << locationY;
+		*pBuf << PKT_TYPE_CreateOtherCharacter_SC << mapID << playerID << nickName << dirVec << location;
 	}
 	catch(int useSize)
 	{
@@ -107,13 +108,13 @@ void WonsikWorldServerProxy::CreateOtherCharacter_SC(SessionInfo sessionInfo, sh
 	_pServer->Unicast(sessionInfo, pBuf, bDisconnect);
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::CreateOtherCharacter_SC(const List<SessionInfo>& sessionInfoList, short mapID, LONG64 playerID, const WString& nickName, float dirX, float dirY, float locationX, float locationY, bool bDisconnect)
+void WonsikWorldServerProxy::CreateOtherCharacter_SC(const List<SessionInfo>& sessionInfoList, short mapID, LONG64 playerID, const WString& nickName, const WWVector2D& dirVec, const WWVector2D& location, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_CreateOtherCharacter_SC << mapID << playerID << nickName << dirX << dirY << locationX << locationY;
+		*pBuf << PKT_TYPE_CreateOtherCharacter_SC << mapID << playerID << nickName << dirVec << location;
 	}
 	catch(int useSize)
 	{
@@ -279,13 +280,13 @@ void WonsikWorldServerProxy::SendChatMessage_SC(const List<SessionInfo>& session
 	}
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::MoveMyCharacter_CS(SessionInfo sessionInfo, short mapID, float destinationX, float destinationY, bool bDisconnect)
+void WonsikWorldServerProxy::MoveMyCharacter_CS(SessionInfo sessionInfo, short mapID, const WWVector2D& destination, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_MoveMyCharacter_CS << mapID << destinationX << destinationY;
+		*pBuf << PKT_TYPE_MoveMyCharacter_CS << mapID << destination;
 	}
 	catch(int useSize)
 	{
@@ -293,13 +294,13 @@ void WonsikWorldServerProxy::MoveMyCharacter_CS(SessionInfo sessionInfo, short m
 	_pServer->Unicast(sessionInfo, pBuf, bDisconnect);
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::MoveMyCharacter_CS(const List<SessionInfo>& sessionInfoList, short mapID, float destinationX, float destinationY, bool bDisconnect)
+void WonsikWorldServerProxy::MoveMyCharacter_CS(const List<SessionInfo>& sessionInfoList, short mapID, const WWVector2D& destination, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_MoveMyCharacter_CS << mapID << destinationX << destinationY;
+		*pBuf << PKT_TYPE_MoveMyCharacter_CS << mapID << destination;
 	}
 	catch(int useSize)
 	{
@@ -310,13 +311,13 @@ void WonsikWorldServerProxy::MoveMyCharacter_CS(const List<SessionInfo>& session
 	}
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::MoveMyCharacter_SC(SessionInfo sessionInfo, short mapID, const Vector<float>& destinationsX, const Vector<float>& destinationsY, bool bDisconnect)
+void WonsikWorldServerProxy::MoveMyCharacter_SC(SessionInfo sessionInfo, short mapID, const Vector<WWVector2D>& destinations, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_MoveMyCharacter_SC << mapID << destinationsX << destinationsY;
+		*pBuf << PKT_TYPE_MoveMyCharacter_SC << mapID << destinations;
 	}
 	catch(int useSize)
 	{
@@ -324,13 +325,13 @@ void WonsikWorldServerProxy::MoveMyCharacter_SC(SessionInfo sessionInfo, short m
 	_pServer->Unicast(sessionInfo, pBuf, bDisconnect);
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::MoveMyCharacter_SC(const List<SessionInfo>& sessionInfoList, short mapID, const Vector<float>& destinationsX, const Vector<float>& destinationsY, bool bDisconnect)
+void WonsikWorldServerProxy::MoveMyCharacter_SC(const List<SessionInfo>& sessionInfoList, short mapID, const Vector<WWVector2D>& destinations, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_MoveMyCharacter_SC << mapID << destinationsX << destinationsY;
+		*pBuf << PKT_TYPE_MoveMyCharacter_SC << mapID << destinations;
 	}
 	catch(int useSize)
 	{
@@ -341,13 +342,13 @@ void WonsikWorldServerProxy::MoveMyCharacter_SC(const List<SessionInfo>& session
 	}
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::MoveOtherCharacter_SC(SessionInfo sessionInfo, short mapID, LONG64 playerID, const Vector<float>& destinationsX, const Vector<float>& destinationsY, bool bDisconnect)
+void WonsikWorldServerProxy::MoveOtherCharacter_SC(SessionInfo sessionInfo, short mapID, LONG64 playerID, const Vector<WWVector2D>& destinations, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_MoveOtherCharacter_SC << mapID << playerID << destinationsX << destinationsY;
+		*pBuf << PKT_TYPE_MoveOtherCharacter_SC << mapID << playerID << destinations;
 	}
 	catch(int useSize)
 	{
@@ -355,13 +356,13 @@ void WonsikWorldServerProxy::MoveOtherCharacter_SC(SessionInfo sessionInfo, shor
 	_pServer->Unicast(sessionInfo, pBuf, bDisconnect);
 	pBuf->DecrementRefCnt();
 }
-void WonsikWorldServerProxy::MoveOtherCharacter_SC(const List<SessionInfo>& sessionInfoList, short mapID, LONG64 playerID, const Vector<float>& destinationsX, const Vector<float>& destinationsY, bool bDisconnect)
+void WonsikWorldServerProxy::MoveOtherCharacter_SC(const List<SessionInfo>& sessionInfoList, short mapID, LONG64 playerID, const Vector<WWVector2D>& destinations, bool bDisconnect)
 {
 	CSendBuffer* pBuf = CSendBuffer::Alloc();
 	pBuf->IncrementRefCnt();
 	try
 	{
-		*pBuf << PKT_TYPE_MoveOtherCharacter_SC << mapID << playerID << destinationsX << destinationsY;
+		*pBuf << PKT_TYPE_MoveOtherCharacter_SC << mapID << playerID << destinations;
 	}
 	catch(int useSize)
 	{

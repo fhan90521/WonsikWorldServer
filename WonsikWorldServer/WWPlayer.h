@@ -1,6 +1,7 @@
 #pragma once
 #include "MyStlContainer.h"
 #include "Session.h"
+#include "WWVector2D.h"
 class WWPlayer
 {
 private:
@@ -8,34 +9,35 @@ private:
 	LONG64 _playerID;
 	SessionInfo _sessionInfo;
 	float _moveSpeed;
-	std::pair<float, float> _dirVec;
-	std::pair<float, float> _location;
-	List<std::pair<float, float>> _destinations;
+	WWVector2D _dirVec;
+	WWVector2D _location;
+	List<WWVector2D> _destinations;
 public:
 	void SetNickName(const WString& nickName);
 	const WString& GetNickNameRef();
 	WString GetNickName();
-	std::pair<float, float> GetLocation();
-	void SetLocation(const std::pair<float, float>& location);
+	WWVector2D GetLocation();
+	void SetLocation(const WWVector2D& location);
 	void SetMoveSpeed(float speed);
-	void SetDestinations(const List<std::pair<float, float>>& destinations,bool bIgnoreFirst);
-	bool GetDestination(std::pair<float, float>& destination);
-	bool GetDestinations(Vector<float>& destinationXs, Vector<float>& destinationYs);
+	void SetDestinations(const List<WWVector2D>& destinations);
+	void SetDestinations(const Vector<WWVector2D>& destinations);
+	bool GetDestination(WWVector2D& destination);
+	bool GetDestinations(Vector<WWVector2D>& destinations);
 	void Stop();
 	bool IsMoving();
 	void SetSessionInfo(SessionInfo sessionInfo);
 	SessionInfo GetSessionInfo();
 	void SetPlayerID(LONG64 id);
 	LONG64 GetPlayerID();
-	void SetDirVec(const std::pair<float, float>& dirVec);
+	void SetDirVec(const WWVector2D& dirVec);
 	void SetDirVec(float x, float y);
-	std::pair<float, float> GetDirVec();
+	WWVector2D GetDirVec();
 
 	void Tick(float deltaTime);
 	void Move(float deltaTime);
 //섹터처리
 private:
-	std::pair<int, int> _sectorPosition;
+	std::pair<int,int> _sectorPosition;
 public:
 	void SetSectorPosition(int iX, int iY);
 	std::pair<int, int> GetSectorPosition();

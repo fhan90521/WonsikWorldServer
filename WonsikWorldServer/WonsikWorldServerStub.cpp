@@ -1,6 +1,7 @@
 #include "WonsikWorldServerStub.h"
 #include "IOCPServer.h"
 #include "Log.h"
+#include "WWVector2D.h"
 bool WonsikWorldServerStub::PacketProcEnterGame_CS(SessionInfo sessionInfo, CRecvBuffer& buf)
 {
 	WString nickName;
@@ -37,20 +38,18 @@ bool WonsikWorldServerStub::PacketProcEnterGame_SC(SessionInfo sessionInfo, CRec
 bool WonsikWorldServerStub::PacketProcCreateMyCharacter_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
 {
 	short mapID;
-	float dirX;
-	float dirY;
-	float locationX;
-	float locationY;
+	WWVector2D dirVec;
+	WWVector2D location;
 	try
 	{
-		buf >> mapID >> dirX >> dirY >> locationX >> locationY;
+		buf >> mapID >> dirVec >> location;
 	}
 	catch(int useSize)
 	{
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcCreateMyCharacter_SC error\n");
 		return false;
 	}
-	ProcCreateMyCharacter_SC(sessionInfo, mapID, dirX, dirY, locationX, locationY);
+	ProcCreateMyCharacter_SC(sessionInfo, mapID, dirVec, location);
 	return true;
 }
 
@@ -59,20 +58,18 @@ bool WonsikWorldServerStub::PacketProcCreateOtherCharacter_SC(SessionInfo sessio
 	short mapID;
 	LONG64 playerID;
 	WString nickName;
-	float dirX;
-	float dirY;
-	float locationX;
-	float locationY;
+	WWVector2D dirVec;
+	WWVector2D location;
 	try
 	{
-		buf >> mapID >> playerID >> nickName >> dirX >> dirY >> locationX >> locationY;
+		buf >> mapID >> playerID >> nickName >> dirVec >> location;
 	}
 	catch(int useSize)
 	{
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcCreateOtherCharacter_SC error\n");
 		return false;
 	}
-	ProcCreateOtherCharacter_SC(sessionInfo, mapID, playerID, nickName, dirX, dirY, locationX, locationY);
+	ProcCreateOtherCharacter_SC(sessionInfo, mapID, playerID, nickName, dirVec, location);
 	return true;
 }
 
@@ -165,36 +162,34 @@ bool WonsikWorldServerStub::PacketProcSendChatMessage_SC(SessionInfo sessionInfo
 bool WonsikWorldServerStub::PacketProcMoveMyCharacter_CS(SessionInfo sessionInfo, CRecvBuffer& buf)
 {
 	short mapID;
-	float destinationX;
-	float destinationY;
+	WWVector2D destination;
 	try
 	{
-		buf >> mapID >> destinationX >> destinationY;
+		buf >> mapID >> destination;
 	}
 	catch(int useSize)
 	{
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcMoveMyCharacter_CS error\n");
 		return false;
 	}
-	ProcMoveMyCharacter_CS(sessionInfo, mapID, destinationX, destinationY);
+	ProcMoveMyCharacter_CS(sessionInfo, mapID, destination);
 	return true;
 }
 
 bool WonsikWorldServerStub::PacketProcMoveMyCharacter_SC(SessionInfo sessionInfo, CRecvBuffer& buf)
 {
 	short mapID;
-	Vector<float> destinationsX;
-	Vector<float> destinationsY;
+	Vector<WWVector2D> destinations;
 	try
 	{
-		buf >> mapID >> destinationsX >> destinationsY;
+		buf >> mapID >> destinations;
 	}
 	catch(int useSize)
 	{
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcMoveMyCharacter_SC error\n");
 		return false;
 	}
-	ProcMoveMyCharacter_SC(sessionInfo, mapID, destinationsX, destinationsY);
+	ProcMoveMyCharacter_SC(sessionInfo, mapID, destinations);
 	return true;
 }
 
@@ -202,18 +197,17 @@ bool WonsikWorldServerStub::PacketProcMoveOtherCharacter_SC(SessionInfo sessionI
 {
 	short mapID;
 	LONG64 playerID;
-	Vector<float> destinationsX;
-	Vector<float> destinationsY;
+	Vector<WWVector2D> destinations;
 	try
 	{
-		buf >> mapID >> playerID >> destinationsX >> destinationsY;
+		buf >> mapID >> playerID >> destinations;
 	}
 	catch(int useSize)
 	{
 		Log::LogOnFile(Log::DEBUG_LEVEL, "PacketProcMoveOtherCharacter_SC error\n");
 		return false;
 	}
-	ProcMoveOtherCharacter_SC(sessionInfo, mapID, playerID, destinationsX, destinationsY);
+	ProcMoveOtherCharacter_SC(sessionInfo, mapID, playerID, destinations);
 	return true;
 }
 

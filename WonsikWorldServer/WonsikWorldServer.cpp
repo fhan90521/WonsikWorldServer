@@ -252,14 +252,14 @@ void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, short ma
 
 }
 
-void WonsikWorldServer::ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short mapID, float destinationX, float destinationY)
+void WonsikWorldServer::ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short mapID, WWVector2D& destination)
 {
 	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
 	int roomID = mapID;
 	if (wwSession && wwSession->roomID == roomID && roomID > ROOM_ID_LOBBY)
 	{
 		_moveCharacterCnt++;
-		_fields[wwSession->roomID]->DoAsync(&WWField::SetCharacterDestination, wwSession, destinationX, destinationY);
+		_fields[wwSession->roomID]->DoAsync(&WWField::SetCharacterDestination, wwSession, destination);
 	}
 	else
 	{

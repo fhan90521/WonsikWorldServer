@@ -68,7 +68,7 @@ private:
 private:
     Set<Node*, cmp> _openList;
     HashMap<std::pair<int, int>, Node*, pair_hash> _closeList;
-    float _cellSize;
+    inline static float _cellSize;
     int _height;
     int _width;
     int _startX=0;
@@ -80,8 +80,9 @@ public:
     ~GridSystem();
     void SetObstacle(int x, int y, bool bObstacle);
     bool IsObstacle(int x, int y);
-    bool IsObstacleByFloat(const std::pair<float, float>& location);
+    bool IsObstacleByFloat(float x, float y);
     bool GetNotObstacleLocation(std::pair<float, float>& location);
     bool GetNearNotObstacleLocation(float x, float y, std::pair<float, float>& location);
     bool FindPath(float startX, float startY, float endX, float endY, List<std::pair<float,float>>& pathPoints);
+    static bool IsSameGrid(float x1, float y1, float x2, float y2);
 };

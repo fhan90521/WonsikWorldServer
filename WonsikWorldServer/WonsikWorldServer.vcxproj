@@ -148,7 +148,6 @@
   <ItemGroup>
     <ClCompile Include="GridSystem.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MathUtil.cpp" />
     <ClCompile Include="WonsikWorldServer.cpp" />
     <ClCompile Include="WonsikWorldServerProxy.cpp" />
     <ClCompile Include="WonsikWorldServerStub.cpp" />
@@ -157,6 +156,7 @@
     <ClCompile Include="WWPlayer.cpp" />
     <ClCompile Include="WWRoomSystem.cpp" />
     <ClCompile Include="WWSession.cpp" />
+    <ClCompile Include="WWVector2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dXdY.h" />
@@ -171,8 +171,8 @@
     <ClInclude Include="WWLobby.h" />
     <ClInclude Include="WWPlayer.h" />
     <ClInclude Include="WWSession.h" />
-    <ClInclude Include="MathUtil.h" />
     <ClInclude Include="WWRoomSystem.h" />
+    <ClInclude Include="WWVector2D.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="WWServerSet.json" />

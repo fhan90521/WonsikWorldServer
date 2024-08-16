@@ -226,10 +226,10 @@ bool GridSystem::IsObstacle(int x, int y)
 {
     return _obstacleMap[y+1][x+1];
 }
-bool GridSystem::IsObstacleByFloat(const std::pair<float, float>& location)
+bool GridSystem::IsObstacleByFloat(float x, float y)
 {
-    int gridX = location.first / _cellSize+1;
-    int gridY = location.second / _cellSize+1;
+    int gridX = x / _cellSize+1;
+    int gridY = y / _cellSize+1;
     return _obstacleMap[gridY][gridX];
 }
 bool GridSystem::GetNotObstacleLocation(std::pair<float, float>& location)
@@ -332,6 +332,16 @@ bool GridSystem::FindPath(float startX, float startY, float endX, float endY, Li
         FreeNodes();
     }
     return ret;
+}
+bool GridSystem::IsSameGrid(float x1, float y1, float x2, float y2)
+{
+    int gridX1 = x1 / _cellSize;
+    int gridY1 = y1 / _cellSize;
+
+    int gridX2 = x2 / _cellSize;
+    int gridY2 = y2 / _cellSize;
+
+    return (gridX1 == gridX2) && (gridY1 == gridY2);
 }
 bool GridSystem::SearchRR(int beginX, int beginY, Node* pParentNode, bool makeNode)
 {
