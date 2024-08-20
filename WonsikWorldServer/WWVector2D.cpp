@@ -56,7 +56,7 @@ CRecvBuffer& operator>>(CRecvBuffer& buf, Vector<WWVector2D>& vectors)
 	return buf;
 }
 
-WWVector2D operator-(WWVector2D vec1, WWVector2D vec2)
+WWVector2D operator-(const WWVector2D& vec1, const WWVector2D& vec2)
 {
 	return WWVector2D(vec1._x - vec2._x, vec1._y - vec2._y);
 }
