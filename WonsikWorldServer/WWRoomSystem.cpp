@@ -4,7 +4,11 @@ void WWRoomSystem::OnLeaveByChangingRoomSession(SessionInfo sessionInfo)
 {
 	_wwServer->DeleteWWSession(sessionInfo);
 }
-WWRoomSystem::WWRoomSystem(WonsikWorldServer* pServer):RoomSystem(pServer)
+void WWRoomSystem::OnError(SessionInfo sessionInfo, RoomError error)
+{
+	_wwServer->Disconnect(sessionInfo);
+}
+WWRoomSystem::WWRoomSystem(WonsikWorldServer* pServer)
 {
 	_wwServer = pServer;
 }

@@ -81,7 +81,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 	  }
 	  if (bFindNoneObstacle == false)
 	  {
-		  auto pairLocation = newLocation.TransferToPair();
+		  std::pair<float, float> pairLocation;
 		  _gridSystem.GetNotObstacleLocation(pairLocation);
 		  newLocation._x = pairLocation.first;
 		  newLocation._y = pairLocation.second;
