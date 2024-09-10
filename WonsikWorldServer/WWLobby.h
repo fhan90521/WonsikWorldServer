@@ -17,6 +17,7 @@ private:
 private:
 	LONG64 _newPlayerID = 1;
 	HashMap<SessionInfo::ID,SharedPtr<struct WWSession>> _guests;
+	HashMap<SessionInfo::ID, SharedPtr<struct WWSession>> _players;
 	HashSet<WString> _namesOnPlay;
 public:
 	void EnterGame(SessionInfo sessionInfo,WString& nickName);

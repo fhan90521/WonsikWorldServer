@@ -62,7 +62,7 @@ void WWLobby::EnterGame(SessionInfo sessionInfo, WString& nickName)
 		return;
 	}
 
-	auto wwSession = iter->second;
+	auto& wwSession = iter->second;
 	if (wwSession->sessionType != SessionType::GUEST)
 	{
 		_wwServer->Disconnect(wwSession->sessionInfo);
@@ -71,7 +71,6 @@ void WWLobby::EnterGame(SessionInfo sessionInfo, WString& nickName)
 
 	if (_namesOnPlay.find(nickName) == _namesOnPlay.end())
 	{
-		_namesOnPlay.insert(nickName);
 		//player »ý¼º
 		wwSession->sessionType = SessionType::PLAYER;
 		WWPlayer* newPlayer = New<WWPlayer>();
@@ -81,6 +80,8 @@ void WWLobby::EnterGame(SessionInfo sessionInfo, WString& nickName)
 		newPlayer->SetSessionInfo(wwSession->sessionInfo);
 		newPlayer->SetPlayerID(_newPlayerID++);
 		
+		_namesOnPlay.insert(nickName);
+		_players[sessionInfo.Id()] = wwSession;
 
 		_wwServer->EnterGame_SC(wwSession->sessionInfo, ENTER_GAME_SUCCESS, newPlayer->GetPlayerID());
 		
@@ -98,18 +99,15 @@ void WWLobby::EnterGame(SessionInfo sessionInfo, WString& nickName)
 
 void WWLobby::LeaveGame(SessionInfo sessionInfo)
 {
-	auto iter = _guests.find(sessionInfo.Id());
-	if (iter == _guests.end())
+	auto iter = _players.find(sessionInfo.Id());
+	if (iter == _players.end())
 	{
-		_wwServer->Disconnect(sessionInfo);
-		Log::LogOnFile(Log::SYSTEM_LEVEL, "LeaveGame guest not found error");
 		return;
 	}
-	auto wwSession = iter->second;
-	if (wwSession->sessionType == SessionType::GUEST)
+	auto& wwSession = iter->second;
+	if (wwSession)
 	{
-		_wwServer->Disconnect(wwSession->sessionInfo);
-		return;
+		_namesOnPlay.erase(wwSession->wwPlayer->GetNickNameRef());
 	}
-	_namesOnPlay.erase(wwSession->wwPlayer->GetNickNameRef());
+	_players.erase(iter);
 }

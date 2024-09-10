@@ -114,15 +114,6 @@ void WonsikWorldServer::OnRecv(SessionInfo sessionInfo,int roomID, CRecvBuffer& 
 		Log::LogOnFile(Log::DEBUG_LEVEL, "OnRecv Error\n");
 		Disconnect(sessionInfo);
 	}
-	else
-	{
-		//RECV1회제한 -> lastRecvTime을 고치고 있는 스레드가 하나라는 것을 보장가능->구조체에 락걸지 않고 lastRecvTime에 쓰기가능
-		SharedPtr<WWSession> wwSession=GetWWSession(sessionInfo);
-		if (wwSession)
-		{
-			wwSession->lastRecvTime = GetTickCount64();
-		}
-	}
 }
 
 SharedPtr<WWSession> WonsikWorldServer::GetWWSession(SessionInfo sessionInfo)
@@ -166,7 +157,7 @@ void WonsikWorldServer::CheckLastRecvTime()
 			for (auto& pairTemp : _wwSessions)
 			{
 				SharedPtr<WWSession>& wwSession = pairTemp.second;
-				if (currentTime - wwSession->lastRecvTime > LAST_RECV_TIME_OUT)
+				if (currentTime - GetLastRecvTime(wwSession->sessionInfo) > LAST_RECV_TIME_OUT)
 				{
 					Disconnect(wwSession->sessionInfo);
 				}
@@ -181,7 +172,6 @@ void WonsikWorldServer::CreateWWSession(SessionInfo sessionInfo)
 	auto newWWSession = MakeShared<WWSession>();
 	newWWSession->sessionInfo = sessionInfo;
 	newWWSession->roomID = ROOM_ID_LOBBY;
-	newWWSession->lastRecvTime = GetTickCount64();
 	newWWSession->sessionType = SessionType::GUEST;
 	
 	{

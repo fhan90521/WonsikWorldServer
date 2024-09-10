@@ -11,7 +11,6 @@ enum class SessionType
 struct WWSession
 {
 	SessionInfo sessionInfo;
-	ULONG64 lastRecvTime;
 	SessionType sessionType;
 	int roomID;
 	class WWPlayer* wwPlayer;
