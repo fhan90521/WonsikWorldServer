@@ -36,24 +36,11 @@ WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("
 	_fields[ROOM_ID_FIELD1]->InitMap(map1);
 	_fields[ROOM_ID_FIELD2]->InitMap(map2);
 
-	if (LAST_RECV_TIME_OUT != 0)
-	{
-		_hShutDownEvent = CreateEvent(NULL, TRUE, false, NULL);
-		_checkRecvTimeThread = new std::thread(&WonsikWorldServer::CheckLastRecvTime, this);
-	}
-	
 	//_monitor.AddInterface("0.0.0.0");
 }
 
 WonsikWorldServer::~WonsikWorldServer()
 {
-	if (LAST_RECV_TIME_OUT != 0)
-	{
-		SetEvent(_hShutDownEvent);
-		_checkRecvTimeThread->join();
-		delete _checkRecvTimeThread;
-		CloseHandle(_hShutDownEvent);
-	}
 	_wwRoomSystem->DeregisterRoom(_lobby);
 	_wwRoomSystem->DeregisterRoom(_fields[1]);
 	_wwRoomSystem->DeregisterRoom(_fields[2]);
@@ -140,32 +127,6 @@ int WonsikWorldServer::GetWWSessionCnt()
 	return ret;
 }
 
-void WonsikWorldServer::CheckLastRecvTime()
-{
-	while (1)
-	{
-		
-		DWORD retWait = WaitForSingleObject(_hShutDownEvent, LAST_RECV_TIME_OUT/2);
-		if (retWait == WAIT_OBJECT_0)
-		{
-			break;
-		}
-		
-		{
-			SHARED_LOCK;
-			ULONG64 currentTime = GetTickCount64();
-			for (auto& pairTemp : _wwSessions)
-			{
-				SharedPtr<WWSession>& wwSession = pairTemp.second;
-				if (currentTime - GetLastRecvTime(wwSession->sessionInfo) > LAST_RECV_TIME_OUT)
-				{
-					Disconnect(wwSession->sessionInfo);
-				}
-
-			}
-		}
-	}
-}
 
 void WonsikWorldServer::CreateWWSession(SessionInfo sessionInfo)
 {

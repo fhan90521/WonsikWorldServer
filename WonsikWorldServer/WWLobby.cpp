@@ -11,6 +11,7 @@
 WWLobby::WWLobby(WonsikWorldServer* pServer): Room(pServer->GetCompletionPortHandle())
 {
 	_wwServer=pServer;
+	_lastCheckTime = GetTickCount64();
 }
 
 void WWLobby::PrintLobbyStatus()
@@ -24,7 +25,7 @@ SessionNum: {}       UpdateTps: {}
 
 void WWLobby::Update(float deltaTime)
 {
-  
+	CheckLastRecvTime();
 }
 
 void WWLobby::OnEnter(SessionInfo sessionInfo)
@@ -50,6 +51,35 @@ void WWLobby::OnLeaveRoomSystem(SessionInfo sessionInfo)
 {
 	OnLeave(sessionInfo);
 	_wwServer->DeleteWWSession(sessionInfo);
+}
+
+void WWLobby::CheckLastRecvTime()
+{
+	ULONG64 curTime = GetCurTime();
+	if (curTime - _lastCheckTime < LAST_RECV_TIME_OUT)
+	{
+		return;
+	}
+	_lastCheckTime = curTime;
+	for (auto& temp : _guests)
+	{
+		auto& wwSession = temp.second;
+		ULONG64 lastRecvTime = _wwServer->GetLastRecvTime(wwSession->sessionInfo);
+		if (curTime - lastRecvTime > LAST_RECV_TIME_OUT)
+		{
+			_wwServer->Disconnect(wwSession->sessionInfo);
+		}
+	}
+
+	for (auto& temp : _players)
+	{
+		auto& wwSession = temp.second;
+		ULONG64 lastRecvTime = _wwServer->GetLastRecvTime(wwSession->sessionInfo);
+		if (curTime - lastRecvTime > LAST_RECV_TIME_OUT)
+		{
+			_wwServer->Disconnect(wwSession->sessionInfo);
+		}
+	}
 }
 
 void WWLobby::EnterGame(SessionInfo sessionInfo, WString& nickName)

@@ -19,6 +19,8 @@ private:
 	HashMap<SessionInfo::ID,SharedPtr<struct WWSession>> _guests;
 	HashMap<SessionInfo::ID, SharedPtr<struct WWSession>> _players;
 	HashSet<WString> _namesOnPlay;
+	ULONG64 _lastCheckTime;
+	void CheckLastRecvTime();
 public:
 	void EnterGame(SessionInfo sessionInfo,WString& nickName);
 	void LeaveGame(SessionInfo sessionInfo);
