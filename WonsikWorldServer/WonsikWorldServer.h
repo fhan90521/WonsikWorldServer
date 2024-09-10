@@ -22,7 +22,7 @@ private:
 	virtual bool OnAcceptRequest(const char* ip, USHORT port) override;
 	virtual void OnAccept(SessionInfo sessionInfo) override;
 	virtual void OnDisconnect(SessionInfo sessionInfo) override;
-	virtual void OnRecv(SessionInfo sessionInfo, CRecvBuffer& buf) override;
+	virtual void OnRecv(SessionInfo sessionInfo,int roomID, CRecvBuffer& buf) override;
 
 private:
 	std::atomic<int> _moveCharacterCnt = 0;
@@ -30,11 +30,11 @@ private:
 	std::atomic<int> _changeMapCnt = 0;
 	std::atomic<int> _sendChatMessageCnt = 0;
 
-	virtual void ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short mapID, WWVector2D& destination) override;
-	virtual void ProcHeartBeat_CS(SessionInfo sessionInfo);
-	virtual void ProcEnterGame_CS(SessionInfo sessionInfo, WString& nickName) override;
-	virtual void ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMapID, short afterMapID) override;
-	virtual void ProcSendChatMessage_CS(SessionInfo sessionInfo, short mapID, WString& chatMessage) override;	
+	virtual void ProcMoveMyCharacter_CS(SessionInfo sessionInfo,int roomID, short mapID, WWVector2D& destination) override;
+	virtual void ProcHeartBeat_CS(SessionInfo sessionInfo, int roomID);
+	virtual void ProcEnterGame_CS(SessionInfo sessionInfo, int roomID, WString& nickName) override;
+	virtual void ProcChangeMap_CS(SessionInfo sessionInfo, int roomID, short beforeMapID, short afterMapID) override;
+	virtual void ProcSendChatMessage_CS(SessionInfo sessionInfo, int roomID, short mapID, WString& chatMessage) override;
 private:
 	class WWRoomSystem* _wwRoomSystem;
 	SharedPtr<class WWLobby> _lobby;

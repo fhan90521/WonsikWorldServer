@@ -14,7 +14,7 @@ public:
 	void PrintFieldStatus();
 	void InitMap(const int MapResource[10][10]);
 private:
-	HashMap<SessionInfo::ID, class WWPlayer*> _playerMap;
+	HashMap<SessionInfo::ID, SharedPtr<struct WWSession>> _players;
 	GridSystem _gridSystem;
 	class WonsikWorldServer* _wwServer;
 	
@@ -43,7 +43,7 @@ private:
 	void UpdateSectorAround(class WWPlayer* wwPlayer);
 public:
 	//Job
-	void SendChatMessage(SharedPtr<struct WWSession>& wwSession, WString& chatMessage);
-	void SetCharacterDestination(SharedPtr<struct WWSession>& wwSession, WWVector2D destination);
-	void ChangeField(SharedPtr<struct WWSession>& wwSession, int afterRoomID);
+	void SendChatMessage(SessionInfo sessionInfo, WString& chatMessage);
+	void SetCharacterDestination(SessionInfo sessionInfo, WWVector2D destination);
+	void ChangeField(SessionInfo sessionInfo, int afterRoomID);
 };

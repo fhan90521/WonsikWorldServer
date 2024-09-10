@@ -29,6 +29,11 @@ void WWLobby::Update(float deltaTime)
 
 void WWLobby::OnEnter(SessionInfo sessionInfo)
 {
+	auto wwSession=_wwServer->GetWWSession(sessionInfo);
+	if (wwSession)
+	{
+		_guests[sessionInfo.Id()] = wwSession;
+	}
 }
 
 int WWLobby::RequestEnter(SessionInfo sessionInfo)
@@ -38,15 +43,26 @@ int WWLobby::RequestEnter(SessionInfo sessionInfo)
 
 void WWLobby::OnLeave(SessionInfo sessionInfo)
 {
+	_guests.erase(sessionInfo.Id());
 }
 
 void WWLobby::OnLeaveRoomSystem(SessionInfo sessionInfo)
 {
+	OnLeave(sessionInfo);
 	_wwServer->DeleteWWSession(sessionInfo);
 }
 
-void WWLobby::EnterGame(SharedPtr<WWSession>& wwSession, WString& nickName)
+void WWLobby::EnterGame(SessionInfo sessionInfo, WString& nickName)
 {
+	auto iter = _guests.find(sessionInfo.Id());
+	if (iter == _guests.end())
+	{
+		_wwServer->Disconnect(sessionInfo);
+		Log::LogOnFile(Log::SYSTEM_LEVEL, "EnterGame guest not found error");
+		return;
+	}
+
+	auto wwSession = iter->second;
 	if (wwSession->sessionType != SessionType::GUEST)
 	{
 		_wwServer->Disconnect(wwSession->sessionInfo);
@@ -80,8 +96,16 @@ void WWLobby::EnterGame(SharedPtr<WWSession>& wwSession, WString& nickName)
 	}
 }
 
-void WWLobby::LeaveGame(SharedPtr<WWSession>& wwSession)
+void WWLobby::LeaveGame(SessionInfo sessionInfo)
 {
+	auto iter = _guests.find(sessionInfo.Id());
+	if (iter == _guests.end())
+	{
+		_wwServer->Disconnect(sessionInfo);
+		Log::LogOnFile(Log::SYSTEM_LEVEL, "LeaveGame guest not found error");
+		return;
+	}
+	auto wwSession = iter->second;
 	if (wwSession->sessionType == SessionType::GUEST)
 	{
 		_wwServer->Disconnect(wwSession->sessionInfo);

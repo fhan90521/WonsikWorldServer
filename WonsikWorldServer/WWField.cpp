@@ -35,16 +35,16 @@ void WWField::PrintFieldStatus()
 	std::cout << std::format(R"(
 --Field {} Status
 PlayerNum: {} ,UpdateTps: {}, SectorUpdateTps: {}
-)",GetRoomID(), _playerMap.size(), GetUpdateCnt(), _sectorUpdateCnt.load());
+)",GetRoomID(), _players.size(), GetUpdateCnt(), _sectorUpdateCnt.load());
 	_sectorUpdateCnt = 0;
 }
 
 void WWField::Update(float deltaTime)
 {
 	
-	for (const auto& tempPair : _playerMap)
+	for (const auto& tempPair : _players)
 	{
-		WWPlayer* wwPlayer=tempPair.second;
+		WWPlayer* wwPlayer=tempPair.second->wwPlayer;
 		wwPlayer->Tick(deltaTime);
 		if (CheckSectorUpdate(wwPlayer) == true)
 		{
@@ -131,7 +131,7 @@ void WWField::OnEnter(SessionInfo sessionInfo)
 
 	  }
 
-	  _playerMap[sessionInfo.Id()] = newPlayer;
+	  _players[sessionInfo.Id()] = wwSession;
 	  _sectorMap[newPlayer->GetSectorY()][newPlayer->GetSectorX()].push_back(newPlayer);
   }
   else
@@ -147,11 +147,11 @@ int WWField::RequestEnter(SessionInfo sessionInfo)
 
 void WWField::OnLeave(SessionInfo sessionInfo)
 {
-	auto iter=_playerMap.find(sessionInfo.Id());
-	if (iter != _playerMap.end())
+	auto iter=_players.find(sessionInfo.Id());
+	if (iter != _players.end())
 	{
-		WWPlayer* pPlayer = iter->second;
-		_playerMap.erase(iter);
+		WWPlayer* pPlayer = iter->second->wwPlayer;
+		_players.erase(iter);
 		_sectorMap[pPlayer->GetSectorY()][pPlayer->GetSectorX()].remove(pPlayer);
 
 		//Log::LogOnConsole(Log::ERROR_LEVEL, "removePlayer ID:%d, roomID %d", pPlayer->GetPlayerID(), GetRoomID());
@@ -460,15 +460,34 @@ void WWField::InitMap(const int MapResource[10][10])
 	}
 }
 
-void WWField::SendChatMessage(SharedPtr<struct WWSession>& wwSession, WString& chatMessage)
+void WWField::SendChatMessage(SessionInfo sessionInfo, WString& chatMessage)
 {
+	auto iter = _players.find(sessionInfo.Id());
+	if (iter == _players.end())
+	{
+		_wwServer->Disconnect(sessionInfo);
+		Log::LogOnFile(Log::SYSTEM_LEVEL, "SendChatMessage player not found error");
+		return;
+	}
+	
+	auto& wwSession = iter->second;
 	List<SessionInfo> sessionInfoListInAroundSector;
 	GetSessionInfoInAroundSector(sessionInfoListInAroundSector, wwSession->wwPlayer, false);
 	_wwServer->SendChatMessage_SC(sessionInfoListInAroundSector, GetRoomID(), wwSession->wwPlayer->GetPlayerID(), chatMessage);
+	
 }
 
-void WWField::SetCharacterDestination(SharedPtr<WWSession>& wwSession, WWVector2D destination)
+void WWField::SetCharacterDestination(SessionInfo sessionInfo, WWVector2D destination)
 {
+	auto iter = _players.find(sessionInfo.Id());
+	if (iter == _players.end())
+	{
+		_wwServer->Disconnect(sessionInfo);
+		Log::LogOnFile(Log::SYSTEM_LEVEL, "SetCharacterDestination player not found error");
+		return;
+	}
+
+	auto& wwSession = iter->second;
 	//비정상 거리인지 체크
 	WWVector2D playerLocation = wwSession->wwPlayer->GetLocation();
 	//Log::LogOnConsole(Log::DEBUG_LEVEL, "serverlocationX: %f serverLocationY: %f destinationX : %f destinationY: %f\n", playerLocation.first, playerLocation.second, destinationX, destinationY);
@@ -535,11 +554,19 @@ void WWField::SetCharacterDestination(SharedPtr<WWSession>& wwSession, WWVector2
 	}
 }
 
-void WWField::ChangeField(SharedPtr<WWSession>& wwSession, int afterMapID)
+void WWField::ChangeField(SessionInfo sessionInfo, int afterMapID)
 {
-	if (ChangeRoom(wwSession->sessionInfo, afterMapID) == false)
+	auto iter = _players.find(sessionInfo.Id());
+	if (iter == _players.end())
 	{
-		_wwServer->Disconnect(wwSession->sessionInfo);
+		_wwServer->Disconnect(sessionInfo);
+		Log::LogOnFile(Log::SYSTEM_LEVEL, "ChangeField player not found error");
+		return;
+	}
+
+	if (ChangeRoom(sessionInfo, afterMapID) == false)
+	{
+		_wwServer->Disconnect(sessionInfo);
 	}
 }
 

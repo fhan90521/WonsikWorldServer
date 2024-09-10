@@ -16,9 +16,10 @@ private:
 	virtual void OnLeaveRoomSystem(SessionInfo sessionInfo) override;
 private:
 	LONG64 _newPlayerID = 1;
+	HashMap<SessionInfo::ID,SharedPtr<struct WWSession>> _guests;
 	HashSet<WString> _namesOnPlay;
 public:
-	void EnterGame(SharedPtr<struct WWSession>& wwSession,WString& nickName);
-	void LeaveGame(SharedPtr<struct WWSession>& wwSession);
+	void EnterGame(SessionInfo sessionInfo,WString& nickName);
+	void LeaveGame(SessionInfo sessionInfo);
 
 };

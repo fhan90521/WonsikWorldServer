@@ -8,7 +8,7 @@ void WWRoomSystem::OnError(SessionInfo sessionInfo, RoomError error)
 {
 	_wwServer->Disconnect(sessionInfo);
 }
-WWRoomSystem::WWRoomSystem(WonsikWorldServer* pServer)
+WWRoomSystem::WWRoomSystem(WonsikWorldServer* pServer) :RoomSystem(pServer)
 {
 	_wwServer = pServer;
 }

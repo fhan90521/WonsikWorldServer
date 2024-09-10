@@ -16,8 +16,8 @@ WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("
 	_fields[ROOM_ID_FIELD1] = MakeShared<WWField>(this);
 	_fields[ROOM_ID_FIELD2] = MakeShared<WWField>(this);
 	
-	int lobbyRoomID = _wwRoomSystem->RegisterRoom(_lobby);
-	if (lobbyRoomID != ROOM_ID_LOBBY)
+	bool retRegisterRoom = _wwRoomSystem->RegisterRoom(_lobby);
+	if (retRegisterRoom==false|| _lobby->GetRoomID() != ROOM_ID_LOBBY)
 	{
 		Log::LogOnFile(Log::SYSTEM_LEVEL, "Lobby Room ID not match");
 		DebugBreak();
@@ -25,8 +25,8 @@ WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("
 	
 	for (int i = 1; i < _fields.size(); i++)
 	{
-		int fieldRoomID = _wwRoomSystem->RegisterRoom(_fields[i]);
-		if (fieldRoomID != _roomIDs[i])
+		retRegisterRoom = _wwRoomSystem->RegisterRoom(_fields[i]);
+		if (retRegisterRoom==false|| _fields[i]->GetRoomID() != _roomIDs[i])
 		{
 			Log::LogOnFile(Log::SYSTEM_LEVEL, "FIELD%d Room ID not match",i);
 			DebugBreak();
@@ -54,9 +54,9 @@ WonsikWorldServer::~WonsikWorldServer()
 		delete _checkRecvTimeThread;
 		CloseHandle(_hShutDownEvent);
 	}
-	_wwRoomSystem->DeregisterRoom(ROOM_ID_LOBBY);
-	_wwRoomSystem->DeregisterRoom(ROOM_ID_FIELD1);
-	_wwRoomSystem->DeregisterRoom(ROOM_ID_FIELD2);
+	_wwRoomSystem->DeregisterRoom(_lobby);
+	_wwRoomSystem->DeregisterRoom(_fields[1]);
+	_wwRoomSystem->DeregisterRoom(_fields[2]);
 	delete _wwRoomSystem;
 
 	CloseServer();
@@ -99,17 +99,17 @@ void WonsikWorldServer::OnAccept(SessionInfo sessionInfo)
 
 void WonsikWorldServer::OnDisconnect(SessionInfo sessionInfo)
 {
-	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo);
-	if (wwSession)
+	_lobby->DoAsync(&WWLobby::LeaveGame, sessionInfo);
+	bool ret = _wwRoomSystem->LeaveRoomSystem(sessionInfo);
+	if (ret == false)
 	{
-		_lobby->DoAsync(&WWLobby::LeaveGame,wwSession);
+		DeleteWWSession(sessionInfo);
 	}
-	_wwRoomSystem->LeaveRoomSystem(sessionInfo);	
 }
 
-void WonsikWorldServer::OnRecv(SessionInfo sessionInfo, CRecvBuffer& buf)
+void WonsikWorldServer::OnRecv(SessionInfo sessionInfo,int roomID, CRecvBuffer& buf)
 {
-	if (PacketProc(sessionInfo, buf) == false)
+	if (PacketProc(sessionInfo, roomID, buf) == false)
 	{
 		Log::LogOnFile(Log::DEBUG_LEVEL, "OnRecv Error\n");
 		Disconnect(sessionInfo);
@@ -178,18 +178,19 @@ void WonsikWorldServer::CheckLastRecvTime()
 
 void WonsikWorldServer::CreateWWSession(SessionInfo sessionInfo)
 {
+	auto newWWSession = MakeShared<WWSession>();
+	newWWSession->sessionInfo = sessionInfo;
+	newWWSession->roomID = ROOM_ID_LOBBY;
+	newWWSession->lastRecvTime = GetTickCount64();
+	newWWSession->sessionType = SessionType::GUEST;
 	
-	bool enterResult = _wwRoomSystem->EnterRoomSystem(sessionInfo, ROOM_ID_LOBBY);
-	if(enterResult == true)
 	{
 		EXCLUSIVE_LOCK;
-		_wwSessions[sessionInfo.Id()] = MakeShared<WWSession>();
-		_wwSessions[sessionInfo.Id()]->sessionInfo = sessionInfo;
-		_wwSessions[sessionInfo.Id()]->roomID = ROOM_ID_LOBBY;
-		_wwSessions[sessionInfo.Id()]->lastRecvTime = GetTickCount64();
-		_wwSessions[sessionInfo.Id()]->sessionType = SessionType::GUEST;
+		_wwSessions[sessionInfo.Id()] = newWWSession;
 	}
-	else
+
+	bool enterResult = _wwRoomSystem->EnterRoomSystem(sessionInfo, ROOM_ID_LOBBY);
+	if (enterResult == false)
 	{
 		Disconnect(sessionInfo);
 	}
@@ -203,13 +204,12 @@ void WonsikWorldServer::DeleteWWSession(SessionInfo sessionInfo)
 	}
 }
 
-void WonsikWorldServer::ProcEnterGame_CS(SessionInfo sessionInfo, WString& nickName)
+void WonsikWorldServer::ProcEnterGame_CS(SessionInfo sessionInfo, int roomID, WString& nickName)
 {
-	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
-	if (wwSession && wwSession->roomID == ROOM_ID_LOBBY)
+	if (roomID == ROOM_ID_LOBBY)
 	{
 		_enterGameCnt++;
-		_lobby->DoAsync(&WWLobby::EnterGame, wwSession, nickName);
+		_lobby->DoAsync(&WWLobby::EnterGame, sessionInfo, nickName);
 	}
 	else
 	{
@@ -218,15 +218,14 @@ void WonsikWorldServer::ProcEnterGame_CS(SessionInfo sessionInfo, WString& nickN
 	}
 }
 
-void WonsikWorldServer::ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMapID, short afterMapID)
+void WonsikWorldServer::ProcChangeMap_CS(SessionInfo sessionInfo, int roomID, short beforeMapID, short afterMapID)
 {
-	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
 	int beforeRoomID = beforeMapID;
 	int afterRoomID = afterMapID;
-	if (wwSession && wwSession->roomID == beforeRoomID && beforeRoomID>ROOM_ID_LOBBY)
+	if (roomID == beforeRoomID && beforeRoomID>ROOM_ID_LOBBY)
 	{
 		_changeMapCnt++;
-		_fields[beforeRoomID]->DoAsync(&WWField::ChangeField, wwSession, afterRoomID);
+		_fields[roomID]->DoAsync(&WWField::ChangeField, sessionInfo, afterRoomID);
 	}
 	else
 	{
@@ -235,14 +234,12 @@ void WonsikWorldServer::ProcChangeMap_CS(SessionInfo sessionInfo, short beforeMa
 	}
 }
 
-void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, short mapID, WString& chatMessage)
+void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, int roomID, short mapID, WString& chatMessage)
 {
-	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
-	int roomID = mapID;
-	if (wwSession && wwSession->roomID == roomID && roomID > ROOM_ID_LOBBY)
+	if (roomID == mapID && roomID > ROOM_ID_LOBBY)
 	{
 		_sendChatMessageCnt++;
-		_fields[wwSession->roomID]->DoAsync(&WWField::SendChatMessage, wwSession, chatMessage);
+		_fields[roomID]->DoAsync(&WWField::SendChatMessage, sessionInfo, chatMessage);
 	}
 	else
 	{
@@ -252,14 +249,12 @@ void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, short ma
 
 }
 
-void WonsikWorldServer::ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short mapID, WWVector2D& destination)
+void WonsikWorldServer::ProcMoveMyCharacter_CS(SessionInfo sessionInfo, int roomID, short mapID, WWVector2D& destination)
 {
-	SharedPtr<WWSession> wwSession = GetWWSession(sessionInfo.Id());
-	int roomID = mapID;
-	if (wwSession && wwSession->roomID == roomID && roomID > ROOM_ID_LOBBY)
+	if (roomID == mapID && roomID > ROOM_ID_LOBBY)
 	{
 		_moveCharacterCnt++;
-		_fields[wwSession->roomID]->DoAsync(&WWField::SetCharacterDestination, wwSession, destination);
+		_fields[roomID]->DoAsync(&WWField::SetCharacterDestination, sessionInfo, destination);
 	}
 	else
 	{
@@ -268,6 +263,6 @@ void WonsikWorldServer::ProcMoveMyCharacter_CS(SessionInfo sessionInfo, short ma
 	}
 }
 
-void WonsikWorldServer::ProcHeartBeat_CS(SessionInfo sessionInfo)
+void WonsikWorldServer::ProcHeartBeat_CS(SessionInfo sessionInfo, int roomID )
 {
 }
