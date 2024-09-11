@@ -169,9 +169,12 @@ void WWField::OnLeave(SessionInfo sessionInfo)
 	
 }
 
-void WWField::OnLeaveRoomSystem(SessionInfo sessionInfo)
+void WWField::OnLeaveRoomSystem(SessionInfo sessionInfo, bool bEnterCompleted)
 {
-	OnLeave(sessionInfo);
+	if (bEnterCompleted)
+	{
+		OnLeave(sessionInfo);
+	}
 	_wwServer->DeleteWWSession(sessionInfo);
 }
 

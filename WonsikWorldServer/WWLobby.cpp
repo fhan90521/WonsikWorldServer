@@ -47,9 +47,12 @@ void WWLobby::OnLeave(SessionInfo sessionInfo)
 	_guests.erase(sessionInfo.Id());
 }
 
-void WWLobby::OnLeaveRoomSystem(SessionInfo sessionInfo)
+void WWLobby::OnLeaveRoomSystem(SessionInfo sessionInfo, bool bEnterCompleted)
 {
-	OnLeave(sessionInfo);
+	if (bEnterCompleted)
+	{
+		OnLeave(sessionInfo);
+	}
 	_wwServer->DeleteWWSession(sessionInfo);
 }
 

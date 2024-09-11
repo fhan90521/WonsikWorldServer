@@ -22,7 +22,7 @@ private:
 	virtual void OnEnter(SessionInfo sessionInfo) override;
 	virtual int RequestEnter(SessionInfo sessionInfo) override;
 	virtual void OnLeave(SessionInfo sessionInfo) override;
-	virtual void OnLeaveRoomSystem(SessionInfo sessionInfo) override;
+	virtual void OnLeaveRoomSystem(SessionInfo sessionInfo,bool bEnterCompleted) override;
 private:
 	//Sector Ã³¸®
 	struct SectorAround

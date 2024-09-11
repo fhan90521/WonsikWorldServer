@@ -41,11 +41,8 @@ WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("
 
 WonsikWorldServer::~WonsikWorldServer()
 {
-	_wwRoomSystem->DeregisterRoom(_lobby);
-	_wwRoomSystem->DeregisterRoom(_fields[1]);
-	_wwRoomSystem->DeregisterRoom(_fields[2]);
+	_wwRoomSystem->CloseRoomSystem();
 	delete _wwRoomSystem;
-
 	CloseServer();
 }
 
