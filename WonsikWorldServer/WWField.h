@@ -43,7 +43,7 @@ private:
 	void UpdateSectorAround(class WWPlayer* wwPlayer);
 public:
 	//Job
-	void SendChatMessage(SessionInfo sessionInfo, WString& chatMessage);
+	void SendChatMessage(SessionInfo sessionInfo, WString chatMessage);
 	void SetCharacterDestination(SessionInfo sessionInfo, WWVector2D destination);
 	void ChangeField(SessionInfo sessionInfo, int afterRoomID);
 };

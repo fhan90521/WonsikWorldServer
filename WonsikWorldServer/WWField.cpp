@@ -463,7 +463,7 @@ void WWField::InitMap(const int MapResource[10][10])
 	}
 }
 
-void WWField::SendChatMessage(SessionInfo sessionInfo, WString& chatMessage)
+void WWField::SendChatMessage(SessionInfo sessionInfo, WString chatMessage)
 {
 	auto iter = _players.find(sessionInfo.Id());
 	if (iter == _players.end())
@@ -520,7 +520,7 @@ void WWField::SetCharacterDestination(SessionInfo sessionInfo, WWVector2D destin
 		//패킷전송
 		for (auto pathPoint : pathPoints)
 		{
-			destinations.push_back(WWVector2D(pathPoint.first,pathPoint.second));
+			destinations.emplace_back(pathPoint.first,pathPoint.second);
 		}
 		wwSession->wwPlayer->SetDestinations(destinations);
 		

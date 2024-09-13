@@ -85,7 +85,7 @@ void WWLobby::CheckLastRecvTime()
 	}
 }
 
-void WWLobby::EnterGame(SessionInfo sessionInfo, WString& nickName)
+void WWLobby::EnterGame(SessionInfo sessionInfo, WString nickName)
 {
 	auto iter = _guests.find(sessionInfo.Id());
 	if (iter == _guests.end())

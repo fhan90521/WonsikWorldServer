@@ -157,7 +157,7 @@ void WonsikWorldServer::ProcEnterGame_CS(SessionInfo sessionInfo, int roomID, WS
 	if (roomID == ROOM_ID_LOBBY)
 	{
 		_enterGameCnt++;
-		_lobby->DoAsync(&WWLobby::EnterGame, sessionInfo, nickName);
+		_lobby->DoAsync(&WWLobby::EnterGame, sessionInfo, std::move(nickName));
 	}
 	else
 	{
@@ -187,7 +187,7 @@ void WonsikWorldServer::ProcSendChatMessage_CS(SessionInfo sessionInfo, int room
 	if (roomID == mapID && roomID > ROOM_ID_LOBBY)
 	{
 		_sendChatMessageCnt++;
-		_fields[roomID]->DoAsync(&WWField::SendChatMessage, sessionInfo, chatMessage);
+		_fields[roomID]->DoAsync(&WWField::SendChatMessage, sessionInfo, std::move(chatMessage));
 	}
 	else
 	{

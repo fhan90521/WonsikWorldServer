@@ -22,7 +22,7 @@ private:
 	ULONG64 _lastCheckTime;
 	void CheckLastRecvTime();
 public:
-	void EnterGame(SessionInfo sessionInfo,WString& nickName);
+	void EnterGame(SessionInfo sessionInfo,WString nickName);
 	void LeaveGame(SessionInfo sessionInfo);
 
 };

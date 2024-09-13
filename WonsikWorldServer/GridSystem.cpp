@@ -34,7 +34,7 @@ void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
         {
             while (1)
             {
-                pathPoints.push_front(std::make_pair( pCurrentNode->x * _cellSize - _cellSize/2, pCurrentNode->y*_cellSize - _cellSize/2));
+                pathPoints.emplace_back(pCurrentNode->x * _cellSize - _cellSize/2, pCurrentNode->y*_cellSize - _cellSize/2);
                 if (pCurrentNode->x == _startX && pCurrentNode->y == _startY)
                 {
                     break;
@@ -309,8 +309,8 @@ bool GridSystem::FindPath(float startX, float startY, float endX, float endY, Li
     if (_startX == _endX && _startY == _endY)
     {
         //JPSearch()함수가 시작과 끝이 같을때 결과를 뱉지 않음 예외처리
-        pathPoints.push_back(std::make_pair(startX, startY));
-        pathPoints.push_back(std::make_pair(endX, endY));
+        pathPoints.emplace_back(startX, startY);
+        pathPoints.emplace_back(endX, endY);
 
     }
     else
