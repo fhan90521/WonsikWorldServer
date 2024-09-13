@@ -34,7 +34,7 @@ void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
         {
             while (1)
             {
-                pathPoints.emplace_back(pCurrentNode->x * _cellSize - _cellSize/2, pCurrentNode->y*_cellSize - _cellSize/2);
+                pathPoints.emplace_front(std::make_pair( pCurrentNode->x * _cellSize - _cellSize/2, pCurrentNode->y*_cellSize - _cellSize/2));
                 if (pCurrentNode->x == _startX && pCurrentNode->y == _startY)
                 {
                     break;
