@@ -7,22 +7,23 @@
 #include <atomic>
 class WWField :public Room
 {
+private:
+	HashMap<SessionInfo::ID, SharedPtr<struct WWSession>> _players;
+	GridSystem _gridSystem;
+	class WonsikWorldServer* _wwServer;
+
+	virtual void Update(float deltaTime) override;
+	virtual void OnEnter(SessionInfo sessionInfo) override;
+	virtual int RequestEnter(SessionInfo sessionInfo) override;
+	virtual void OnLeave(SessionInfo sessionInfo) override;
+	virtual void OnLeaveRoomSystem(SessionInfo sessionInfo, bool bEnterCompleted) override;
 public:
 	WWField(class WonsikWorldServer* pServer);
 	virtual ~WWField();
 	std::atomic<int> _sectorUpdateCnt = 0;
 	void PrintFieldStatus();
 	void InitMap(const int MapResource[10][10]);
-private:
-	HashMap<SessionInfo::ID, SharedPtr<struct WWSession>> _players;
-	GridSystem _gridSystem;
-	class WonsikWorldServer* _wwServer;
-	
-	virtual void Update(float deltaTime) override;
-	virtual void OnEnter(SessionInfo sessionInfo) override;
-	virtual int RequestEnter(SessionInfo sessionInfo) override;
-	virtual void OnLeave(SessionInfo sessionInfo) override;
-	virtual void OnLeaveRoomSystem(SessionInfo sessionInfo,bool bEnterCompleted) override;
+
 private:
 	//Sector Ã³¸®
 	struct SectorAround
