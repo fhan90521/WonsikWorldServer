@@ -1,5 +1,5 @@
 #pragma once
-#include "Session.h"
+#include "Network/Session.h"
 #include <memory>
 #include <atomic>
 enum class SessionType

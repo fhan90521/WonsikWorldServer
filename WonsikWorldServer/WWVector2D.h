@@ -1,7 +1,7 @@
 #pragma once
-#include "CSendBuffer.h"
-#include "CRecvBuffer.h"
-#include "MyStlContainer.h"
+#include "Buffer/CSendBuffer.h"
+#include "Buffer/CRecvBuffer.h"
+#include "Container/MyStlContainer.h"
 class WWVector2D
 {
 public:

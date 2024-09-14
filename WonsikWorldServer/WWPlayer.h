@@ -1,6 +1,6 @@
 #pragma once
-#include "MyStlContainer.h"
-#include "Session.h"
+#include "Container/MyStlContainer.h"
+#include "Network/Session.h"
 #include "WWVector2D.h"
 class WWPlayer
 {

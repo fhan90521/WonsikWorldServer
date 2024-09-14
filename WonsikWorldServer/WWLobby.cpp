@@ -2,12 +2,10 @@
 #include "WWSession.h"
 #include "WonsikWorldServer.h"
 #include "WWEnum.h"
-#include "MakeShared.h"
 #include "WWPlayer.h"
 #include <memory>
-#include "RoomSystem.h"
-#include "MyNew.h"
 #include <format>
+#include <iostream>
 WWLobby::WWLobby(WonsikWorldServer* pServer): Room(pServer->GetCompletionPortHandle())
 {
 	_wwServer=pServer;

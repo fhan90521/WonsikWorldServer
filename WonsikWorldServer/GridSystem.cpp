@@ -1,5 +1,4 @@
 #include "GridSystem.h"
-#include "MyWindow.h"
 void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
 {
     Node* pStartNode = _nodePool.Alloc();

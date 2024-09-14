@@ -1,6 +1,6 @@
 #include "WWPlayer.h"
 #include "WWEnum.h"
-#include "Log.h"
+#include "DebugTool/Log.h"
 #include "GridSystem.h"
 void WWPlayer::SetNickName(const WString& nickName)
 {

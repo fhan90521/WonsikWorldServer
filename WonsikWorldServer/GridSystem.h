@@ -1,6 +1,6 @@
 #pragma once
-#include "MyStlContainer.h"
-#include "TlsObjectPool.h"
+#include "Container/MyStlContainer.h"
+#include "Memory/TlsObjectPool.h"
 class GridSystem
 {
 private:

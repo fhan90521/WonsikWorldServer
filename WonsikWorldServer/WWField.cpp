@@ -4,11 +4,11 @@
 #include "WWSession.h"
 #include "WWPlayer.h"
 #include "dXdY.h"
-#include "Room.h"
 #include "MapSource.h"
+#include "WWVector2D.h"
+#include <iostream>
 #include <cmath>
 #include <format>
-#include "WWVector2D.h"
 WWField::WWField(WonsikWorldServer* pServer):Room(pServer->GetCompletionPortHandle()),_gridSystem(MAP_HEIGHT/GRID_CELL_SIZE,MAP_WIDTH / GRID_CELL_SIZE, GRID_CELL_SIZE )
 {
     _wwServer = pServer;
