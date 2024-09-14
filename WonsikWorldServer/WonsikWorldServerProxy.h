@@ -1,12 +1,11 @@
 #pragma once
 #include "Network/Session.h"
-#include "Network/IOCPServer.h"
 #include "Container/MyStlContainer.h"
 class WWVector2D;
 class WonsikWorldServerProxy
 {
 private:
-	IOCPServer* _pServer;
+	class IOCPServer* _pServer;
 public:
 	void EnterGame_CS(SessionInfo sessionInfo, const WString& nickName, bool bDisconnect = false);
 	void EnterGame_CS(const List<SessionInfo>& sessionInfoList, const WString& nickName, bool bDisconnect = false);
@@ -47,7 +46,7 @@ public:
 	void HeartBeat_CS(SessionInfo sessionInfo, bool bDisconnect = false);
 	void HeartBeat_CS(const List<SessionInfo>& sessionInfoList, bool bDisconnect = false);
 
-	WonsikWorldServerProxy(IOCPServer* pServer)
+	WonsikWorldServerProxy(class IOCPServer* pServer)
 	{
 		_pServer = pServer;
 	}

@@ -1,5 +1,6 @@
 #include "WonsikWorldServerProxy.h"
 #include "WonsikWorldPKT_TYPE.h"
+#include "Network/IOCPServer.h"
 #include "WWVector2D.h"
 void WonsikWorldServerProxy::EnterGame_CS(SessionInfo sessionInfo, const WString& nickName, bool bDisconnect)
 {

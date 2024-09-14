@@ -35,7 +35,7 @@ CRecvBuffer& operator>>(CRecvBuffer& buf, WWVector2D& vec)
 
 CSendBuffer& operator<<(CSendBuffer& buf, const Vector<WWVector2D>& vectors)
 {
-	USHORT vecCnt = vectors.size();
+	unsigned short vecCnt = vectors.size();
 	buf << vecCnt;
 	for (int i = 0; i < vecCnt; i++)
 	{
@@ -46,7 +46,7 @@ CSendBuffer& operator<<(CSendBuffer& buf, const Vector<WWVector2D>& vectors)
 
 CRecvBuffer& operator>>(CRecvBuffer& buf, Vector<WWVector2D>& vectors)
 {
-	USHORT vecCnt;
+	unsigned short vecCnt;
 	buf >> vecCnt;
 	vectors.resize(vecCnt);
 	for (int i = 0; i < vecCnt; i++)
