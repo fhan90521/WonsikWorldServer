@@ -463,7 +463,7 @@ void WWField::InitMap(const int MapResource[10][10])
 	}
 }
 
-void WWField::SendChatMessage(SessionInfo sessionInfo, WString chatMessage)
+void WWField::SendChatMessage(SessionInfo sessionInfo, WString& chatMessage)
 {
 	auto iter = _players.find(sessionInfo.Id());
 	if (iter == _players.end())
@@ -480,7 +480,7 @@ void WWField::SendChatMessage(SessionInfo sessionInfo, WString chatMessage)
 	
 }
 
-void WWField::SetCharacterDestination(SessionInfo sessionInfo, WWVector2D destination)
+void WWField::SetCharacterDestination(SessionInfo sessionInfo, WWVector2D& destination)
 {
 	auto iter = _players.find(sessionInfo.Id());
 	if (iter == _players.end())
