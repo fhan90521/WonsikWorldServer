@@ -1,12 +1,13 @@
 #include "WWRoomSystem.h"
 #include "WonsikWorldServer.h"
-void WWRoomSystem::OnLeaveByChangingRoomSession(SessionInfo sessionInfo)
+void WWRoomSystem::OnLeaveRoomSystem(SessionInfo sessionInfo)
 {
 	_wwServer->DeleteWWSession(sessionInfo);
 }
-void WWRoomSystem::OnError(SessionInfo sessionInfo, RoomError error)
+bool WWRoomSystem::CheckCanLeaveSystem(SessionInfo sessionInfo)
 {
-	_wwServer->Disconnect(sessionInfo);
+	int i = rand() % 5;
+	return i==0;
 }
 WWRoomSystem::WWRoomSystem(WonsikWorldServer* pServer) :RoomSystem(pServer)
 {

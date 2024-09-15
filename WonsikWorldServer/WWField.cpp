@@ -34,8 +34,8 @@ void WWField::PrintFieldStatus()
 {
 	std::cout << std::format(R"(
 --Field {} Status
-PlayerNum: {} ,UpdateTps: {}, SectorUpdateTps: {}
-)",GetRoomID(), _players.size(), GetUpdateCnt(), _sectorUpdateCnt.load());
+SessionCnt: {},  PlayerNum: {} ,UpdateTps: {}, SectorUpdateTps: {}
+)",GetRoomID(),GetSessionCnt(), _players.size(), GetUpdateCnt(), _sectorUpdateCnt.load());
 	_sectorUpdateCnt = 0;
 }
 
@@ -140,9 +140,10 @@ void WWField::OnEnter(SessionInfo sessionInfo)
   }
 }
 
-int WWField::RequestEnter(SessionInfo sessionInfo)
+bool WWField::CheckCanLeave(SessionInfo sessionInfo)
 {
-    return ENTER_SUCCESS;
+	int i = rand() % 4;
+	return i == 0;
 }
 
 void WWField::OnLeave(SessionInfo sessionInfo)
@@ -167,15 +168,6 @@ void WWField::OnLeave(SessionInfo sessionInfo)
 		}
 	}
 	
-}
-
-void WWField::OnLeaveRoomSystem(SessionInfo sessionInfo, bool bEnterCompleted)
-{
-	if (bEnterCompleted)
-	{
-		OnLeave(sessionInfo);
-	}
-	_wwServer->DeleteWWSession(sessionInfo);
 }
 
 void WWField::GetSectorAround(WWPlayer* wwPlayer, SectorAround& sectorAround)

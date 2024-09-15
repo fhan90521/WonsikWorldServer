@@ -35,23 +35,15 @@ void WWLobby::OnEnter(SessionInfo sessionInfo)
 	}
 }
 
-int WWLobby::RequestEnter(SessionInfo sessionInfo)
+bool WWLobby::CheckCanLeave(SessionInfo sessionInfo)
 {
-    return ENTER_SUCCESS;
+	int i = rand()%4;
+	return i==0;
 }
 
 void WWLobby::OnLeave(SessionInfo sessionInfo)
 {
 	_guests.erase(sessionInfo.Id());
-}
-
-void WWLobby::OnLeaveRoomSystem(SessionInfo sessionInfo, bool bEnterCompleted)
-{
-	if (bEnterCompleted)
-	{
-		OnLeave(sessionInfo);
-	}
-	_wwServer->DeleteWWSession(sessionInfo);
 }
 
 void WWLobby::CheckLastRecvTime()

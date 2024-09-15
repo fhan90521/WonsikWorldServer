@@ -11,9 +11,8 @@ private:
 	class WonsikWorldServer* _wwServer;
 	virtual void Update(float deltaTime) override;
 	virtual void OnEnter(SessionInfo sessionInfo) override;
-	virtual int RequestEnter(SessionInfo sessionInfo) override;
+	virtual bool CheckCanLeave(SessionInfo sessionInfo) override;
 	virtual void OnLeave(SessionInfo sessionInfo) override;
-	virtual void OnLeaveRoomSystem(SessionInfo sessionInfo,bool bEnterCompleted) override;
 private:
 	LONG64 _newPlayerID = 1;
 	HashMap<SessionInfo::ID,SharedPtr<struct WWSession>> _guests;

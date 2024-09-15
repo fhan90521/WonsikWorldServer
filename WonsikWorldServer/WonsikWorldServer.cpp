@@ -57,7 +57,7 @@ void WonsikWorldServer::PrintServerStatus()
 {
 	std::cout << std::format(R"(
 -------------------------------------
-SessionNum: {}	Accept Tps: {}	RecvMessageTps: {}	SendMessageTps: {}	SessionCntInRoomSystem: {}
+SessionNum: {}  Accept Tps: {}	RecvMessageTps: {}	SendMessageTps: {}	SessionCntInRoomSystem: {}
 
 MoveCharacterJobTps: {}	EnterGameJobTps: {}	ChangeMapJobTps: {}	SendChatMessageJobTps: {}
 )", GetWWSessionCnt(), GetAcceptCnt(), GetRecvCnt(), GetSendCnt(),_wwRoomSystem->GetSessionCntInRoomSystem(), _moveCharacterCnt.load(), _enterGameCnt.load(), _changeMapCnt.load(), _sendChatMessageCnt.load());
