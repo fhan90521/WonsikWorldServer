@@ -9,7 +9,7 @@ bool WWRoomSystem::CheckCanLeaveSystem(SessionInfo sessionInfo)
 	int i = rand() % 5;
 	return i==0;
 }
-WWRoomSystem::WWRoomSystem(WonsikWorldServer* pServer) :RoomSystem(pServer)
+WWRoomSystem::WWRoomSystem(WonsikWorldServer* pServer) :RoomSystem(pServer,pServer->GetCompletionPortHandle())
 {
 	_wwServer = pServer;
 }
