@@ -13,7 +13,7 @@
 #include <format>
 WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("WWServerSet.Json")
 {
-	_wwRoomSystem = new WWRoomSystem(this);
+	_wwRoomSystem = MakeShared<WWRoomSystem>(this);
 	_lobby = MakeShared<WWLobby>(this);
 	_fields[ROOM_ID_FIELD1] = MakeShared<WWField>(this);
 	_fields[ROOM_ID_FIELD2] = MakeShared<WWField>(this);
@@ -44,13 +44,13 @@ WonsikWorldServer::WonsikWorldServer():WonsikWorldServerProxy(this),IOCPServer("
 WonsikWorldServer::~WonsikWorldServer()
 {
 	_wwRoomSystem->CloseRoomSystem();
-	delete _wwRoomSystem;
 	CloseServer();
 }
 
 void WonsikWorldServer::Run()
 {
 	IOCPRun();
+	_wwRoomSystem->Run();
 }
 
 void WonsikWorldServer::PrintServerStatus()

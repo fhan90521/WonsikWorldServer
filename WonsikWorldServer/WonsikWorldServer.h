@@ -36,7 +36,7 @@ private:
 	virtual void ProcChangeMap_CS(SessionInfo sessionInfo, int roomID, short beforeMapID, short afterMapID) override;
 	virtual void ProcSendChatMessage_CS(SessionInfo sessionInfo, int roomID, short mapID, WString& chatMessage) override;
 private:
-	class WWRoomSystem* _wwRoomSystem;
+	SharedPtr<class WWRoomSystem> _wwRoomSystem;
 	SharedPtr<class WWLobby> _lobby;
 	Array<SharedPtr<class WWField>,3> _fields;
 	Array<int, 3> _roomIDs = { ROOM_ID_LOBBY,ROOM_ID_FIELD1,ROOM_ID_FIELD2 };
