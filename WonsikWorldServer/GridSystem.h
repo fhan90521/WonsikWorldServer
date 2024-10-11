@@ -64,7 +64,6 @@ private:
     void AStar(List<std::pair<float, float>>& pathPoints);
     bool** _obstacleMap;
     TlsObjectPool<Node,true> _nodePool;
-    Vector<Node*> _allocatedNodes;
 private:
     Set<Node*, cmp> _openList;
     HashMap<std::pair<int, int>, Node*, pair_hash> _closeList;

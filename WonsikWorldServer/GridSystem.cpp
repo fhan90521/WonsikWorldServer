@@ -3,7 +3,6 @@ void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
 {
     Node* pStartNode = _nodePool.Alloc();
     //Node* pStartNode = new Node;
-    _allocatedNodes.push_back(pStartNode);
 
     pStartNode->x = _startX;
     pStartNode->y = _startY;
@@ -169,7 +168,6 @@ void GridSystem::AStar(List<std::pair<float, float>>& pathPoints)
 {
     //Node* pStartNode = new Node;
     Node* pStartNode =  _nodePool.Alloc();
-    _allocatedNodes.push_back(pStartNode);
     
     pStartNode->x = _startX;
     pStartNode->y = _startY;
@@ -314,8 +312,6 @@ bool GridSystem::FindPath(float startX, float startY, float endX, float endY, Li
     }
     else
     {
-        _openList.clear();
-        _closeList.clear();
         JPSearch(pathPoints);
         if (pathPoints.size() < 2)
         {
@@ -655,7 +651,6 @@ GridSystem::Node* GridSystem::MakeNewNode(int x, int y, Node* pParentNode)
 {
     Node* pNewNode = _nodePool.Alloc();
     //Node* pNewNode = new Node;
-    _allocatedNodes.push_back(pNewNode);
     pNewNode->x = x;
     pNewNode->y = y;
     pNewNode->pParent = pParentNode;
@@ -816,11 +811,11 @@ bool GridSystem::CheckObstacleOnLineByBresenham(int beginX, int beginY, int endX
 }
 void GridSystem::FreeNodes()
 {
-    for (Node* pNode : _allocatedNodes)
+    for (auto& [location, pNode] : _closeList)
     {
-        //delete pNode;
         _nodePool.Free(pNode);
     }
-    _allocatedNodes.clear();
+    _openList.clear();
+    _closeList.clear();
 }
 
