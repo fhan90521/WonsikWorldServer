@@ -20,17 +20,6 @@ private:
             id = newNodeId++;
         }
 	};
-    struct pair_hash
-    {
-        template <class T1, class T2>
-        std::size_t operator () (std::pair<T1, T2> const& pair) const
-        {
-            std::size_t h1 = std::hash<T1>()(pair.first);
-            std::size_t h2 = std::hash<T2>()(pair.second);
-
-            return h1 ^ h2;
-        }
-    };
     struct cmp {
         bool operator()(Node* a, Node* b) const {
 
@@ -66,7 +55,8 @@ private:
     TlsObjectPool<Node,true> _nodePool;
 private:
     Set<Node*, cmp> _openList;
-    HashMap<std::pair<int, int>, Node*, pair_hash> _closeList;
+    Map<std::pair<int, int>, Node*> _closeList;
+    Map<std::pair<int, int>, Node*> _costMap;
     inline static float _cellSize;
     int _height;
     int _width;

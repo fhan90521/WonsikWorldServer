@@ -8,7 +8,8 @@ void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
     pStartNode->y = _startY;
     pStartNode->moveLen = 0;
     pStartNode->destLen = sqrt(pow(abs(pStartNode->x - _endX), 2) + pow(abs(pStartNode->y - _endY), 2));
-    _closeList[std::make_pair(pStartNode->x, pStartNode->y)] = pStartNode;
+    auto startLocation = std::make_pair(pStartNode->x, pStartNode->y);
+    _costMap[startLocation] = pStartNode;
 
     SearchRR(_startX, _startY, pStartNode);
     SearchRD(pStartNode);
@@ -18,6 +19,8 @@ void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
     SearchLU(pStartNode);
     SearchUU(_startX, _startY, pStartNode);
     SearchRU(pStartNode);
+    
+    _closeList[startLocation] = pStartNode;
 
     while (1)
     {
@@ -162,7 +165,9 @@ void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
                 SearchLD(pCurrentNode);
             }
         }
+        _closeList[std::make_pair(pCurrentNode->x, pCurrentNode->y)] = pStartNode;
     }
+
 }
 void GridSystem::AStar(List<std::pair<float, float>>& pathPoints)
 {
@@ -173,9 +178,11 @@ void GridSystem::AStar(List<std::pair<float, float>>& pathPoints)
     pStartNode->y = _startY;
     pStartNode->moveLen = 0;
     pStartNode->destLen = sqrt(pow(abs(pStartNode->x - _endX), 2) + pow(abs(pStartNode->y - _endY), 2));
-
+    
+    auto startLocation = std::make_pair(pStartNode->x, pStartNode->y);
+    _costMap[startLocation] = pStartNode;
     _openList.insert(pStartNode);
-    _closeList[std::make_pair(_startX, _startY)] = pStartNode;
+
     while (1)
     {
         if (_openList.empty())
@@ -212,6 +219,7 @@ void GridSystem::AStar(List<std::pair<float, float>>& pathPoints)
                 }
             }
         }
+        _closeList[std::make_pair(pCurrentNode->x, pCurrentNode->y)] = pStartNode;
     }
     return;
 }
@@ -663,23 +671,27 @@ void GridSystem::UpdateLists(int currentX, int currentY, Node* pParentNode)
     auto pairXY = std::make_pair(currentX, currentY);
     if (_closeList.find(pairXY) == _closeList.end())
     {
-        Node* pNewNode = MakeNewNode(currentX, currentY, pParentNode);
-        _openList.insert(pNewNode);
-        _closeList[pairXY] = pNewNode;
-    }
-    else
-    {
-        Node* pRevisitNode = _closeList[pairXY];
-        double prevVal = pRevisitNode->destLen + pRevisitNode->moveLen;
-        double destLen = sqrt(pow(abs(currentX - _endX), 2) + pow(abs(currentY - _endY), 2));
-        double moveLen = pParentNode->moveLen + sqrt(pow(abs(currentX - pParentNode->x), 2) + pow(abs(currentY - pParentNode->y), 2));
-        if (prevVal > destLen + moveLen)
+        auto iter = _costMap.find(pairXY);
+        if (iter == _costMap.end())
         {
-            _openList.erase(pRevisitNode);
-            pRevisitNode->destLen = destLen;
-            pRevisitNode->moveLen = moveLen;
-            pRevisitNode->pParent = pParentNode;
-            _openList.insert(pRevisitNode);
+            Node* pNewNode = MakeNewNode(currentX, currentY, pParentNode);
+            _openList.insert(pNewNode);
+            _costMap[pairXY] = pNewNode;
+        }
+        else
+        {
+            Node* pRevisitNode = iter->second;
+            double prevVal = pRevisitNode->destLen + pRevisitNode->moveLen;
+            double destLen = sqrt(pow(abs(currentX - _endX), 2) + pow(abs(currentY - _endY), 2));
+            double moveLen = pParentNode->moveLen + sqrt(pow(abs(currentX - pParentNode->x), 2) + pow(abs(currentY - pParentNode->y), 2));
+            if (prevVal > destLen + moveLen)
+            {
+                _openList.erase(pRevisitNode);
+                pRevisitNode->destLen = destLen;
+                pRevisitNode->moveLen = moveLen;
+                pRevisitNode->pParent = pParentNode;
+                _openList.insert(pRevisitNode);
+            }
         }
     }
 }
@@ -811,11 +823,12 @@ bool GridSystem::CheckObstacleOnLineByBresenham(int beginX, int beginY, int endX
 }
 void GridSystem::FreeNodes()
 {
-    for (auto& [location, pNode] : _closeList)
+    for (auto& [location, pNode] : _costMap)
     {
         _nodePool.Free(pNode);
     }
     _openList.clear();
     _closeList.clear();
+    _costMap.clear();
 }
 
