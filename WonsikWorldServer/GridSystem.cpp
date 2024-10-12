@@ -20,16 +20,16 @@ void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
     SearchUU(_startX, _startY, pStartNode);
     SearchRU(pStartNode);
     
-    _closeList[startLocation] = pStartNode;
+    _closeSet.insert(startLocation);
 
     while (1)
     {
-        if (_openList.empty())
+        if (_openSet.empty())
         {
             break;
         }
-        Node* pCurrentNode = *_openList.begin(); 
-        _openList.erase(_openList.begin());
+        Node* pCurrentNode = *_openSet.begin(); 
+        _openSet.erase(_openSet.begin());
 
         if (pCurrentNode->x == _endX && pCurrentNode->y == _endY)
         {
@@ -165,7 +165,7 @@ void GridSystem::JPSearch(List<std::pair<float, float>>& pathPoints)
                 SearchLD(pCurrentNode);
             }
         }
-        _closeList[std::make_pair(pCurrentNode->x, pCurrentNode->y)] = pStartNode;
+        _closeSet.insert(std::make_pair(pCurrentNode->x, pCurrentNode->y));
     }
 
 }
@@ -181,16 +181,16 @@ void GridSystem::AStar(List<std::pair<float, float>>& pathPoints)
     
     auto startLocation = std::make_pair(pStartNode->x, pStartNode->y);
     _costMap[startLocation] = pStartNode;
-    _openList.insert(pStartNode);
+    _openSet.insert(pStartNode);
 
     while (1)
     {
-        if (_openList.empty())
+        if (_openSet.empty())
         {
             break;
         }
-        Node* pCurrentNode = *_openList.begin(); 
-        _openList.erase(_openList.begin());
+        Node* pCurrentNode = *_openSet.begin();
+        _openSet.erase(_openSet.begin());
         if (pCurrentNode->x == _endX && pCurrentNode->y == _endY)
         {
             while (1)
@@ -219,7 +219,7 @@ void GridSystem::AStar(List<std::pair<float, float>>& pathPoints)
                 }
             }
         }
-        _closeList[std::make_pair(pCurrentNode->x, pCurrentNode->y)] = pStartNode;
+        _closeSet.insert(std::make_pair(pCurrentNode->x, pCurrentNode->y));
     }
     return;
 }
@@ -669,13 +669,13 @@ GridSystem::Node* GridSystem::MakeNewNode(int x, int y, Node* pParentNode)
 void GridSystem::UpdateLists(int currentX, int currentY, Node* pParentNode)
 {
     auto pairXY = std::make_pair(currentX, currentY);
-    if (_closeList.find(pairXY) == _closeList.end())
+    if (_closeSet.find(pairXY) == _closeSet.end())
     {
         auto iter = _costMap.find(pairXY);
         if (iter == _costMap.end())
         {
             Node* pNewNode = MakeNewNode(currentX, currentY, pParentNode);
-            _openList.insert(pNewNode);
+            _openSet.insert(pNewNode);
             _costMap[pairXY] = pNewNode;
         }
         else
@@ -686,11 +686,11 @@ void GridSystem::UpdateLists(int currentX, int currentY, Node* pParentNode)
             double moveLen = pParentNode->moveLen + sqrt(pow(abs(currentX - pParentNode->x), 2) + pow(abs(currentY - pParentNode->y), 2));
             if (prevVal > destLen + moveLen)
             {
-                _openList.erase(pRevisitNode);
+                _openSet.erase(pRevisitNode);
                 pRevisitNode->destLen = destLen;
                 pRevisitNode->moveLen = moveLen;
                 pRevisitNode->pParent = pParentNode;
-                _openList.insert(pRevisitNode);
+                _openSet.insert(pRevisitNode);
             }
         }
     }
@@ -827,8 +827,8 @@ void GridSystem::FreeNodes()
     {
         _nodePool.Free(pNode);
     }
-    _openList.clear();
-    _closeList.clear();
+    _openSet.clear();
+    _closeSet.clear();
     _costMap.clear();
 }
 

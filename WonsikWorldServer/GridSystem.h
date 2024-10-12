@@ -54,8 +54,8 @@ private:
     bool** _obstacleMap;
     TlsObjectPool<Node,true> _nodePool;
 private:
-    Set<Node*, cmp> _openList;
-    Map<std::pair<int, int>, Node*> _closeList;
+    Set<Node*, cmp> _openSet;
+    Set<std::pair<int, int>> _closeSet;
     Map<std::pair<int, int>, Node*> _costMap;
     inline static float _cellSize;
     int _height;
