@@ -34,8 +34,8 @@ void WWField::PrintFieldStatus()
 {
 	std::cout << std::format(R"(
 --Field {} Status
-SessionCnt: {},  PlayerNum: {} ,UpdateTps: {}, SectorUpdateTps: {}
-)",GetRoomID(),GetSessionCnt(), _players.size(), GetUpdateCnt(), _sectorUpdateCnt.load());
+SessionCnt: {},  PlayerNum: {} ,UpdateTps: {}, SectorUpdateTps: {} JobQLen: {}
+)",GetRoomID(),GetSessionCnt(), _players.size(), GetUpdateCnt(), _sectorUpdateCnt.load(),GetJobQueueLen());
 	_sectorUpdateCnt = 0;
 }
 

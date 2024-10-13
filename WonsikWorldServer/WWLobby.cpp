@@ -16,8 +16,8 @@ void WWLobby::PrintLobbyStatus()
 {
 	std::cout << std::format(R"(
 --LobbyStatus
-SessionNum: {}       UpdateTps: {}
-)", GetSessionCnt(), GetUpdateCnt());
+SessionNum: {}       UpdateTps: {}	JobQLen: {}
+)", GetSessionCnt(), GetUpdateCnt(), GetJobQueueLen());
 
 }
 
