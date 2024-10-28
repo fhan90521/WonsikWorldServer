@@ -107,7 +107,6 @@ WWVector2D WWPlayer::GetDirVec()
     return _dirVec;
 }
 
-
 void WWPlayer::Tick(float deltaTime)
 {
     Move(deltaTime);
